@@ -61,6 +61,8 @@ summary{cursor:pointer;color:var(--mute);font-size:13px}
 .tasks label{display:flex;gap:9px;align-items:center;padding:4px 4px;border-radius:5px}
 .tasks label:hover{background:var(--p)}.tasks .d{color:var(--mute);text-decoration:line-through}
 .acts{display:flex;gap:8px;margin-top:10px}
+textarea{font:inherit;width:100%;min-height:170px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical;margin-top:8px}
+.hint{color:var(--mute);font-size:13px;margin:6px 0 0}
 .empty{color:var(--mute);padding:18px 0;text-align:center}
 .adm{display:none}body.admin .adm{display:inline-block}
 dialog{border:1px solid var(--line);border-radius:10px;background:var(--p);color:var(--ink);padding:20px;width:min(440px,92vw)}
@@ -85,7 +87,7 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}di
   <div class="cols">
     <div class="side">
       <section>
-        <div class="hd"><h2>ТО на месяц</h2><span class="cnt" id="toCnt"></span></div>
+        <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт списком</button></div>
         <div class="bar"><i id="toBar"></i></div>
         <div id="toList"></div>
         <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">Добавить</button></div>
@@ -96,7 +98,7 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}di
       </section>
     </div>
     <section>
-      <div class="hd"><h2>Открытия магазинов</h2><button class="pri adm" id="opNew">+ Новое открытие</button></div>
+      <div class="hd"><h2>Открытия магазинов</h2><div style="display:flex;gap:8px"><button class="adm" id="opImp">Импорт списком</button><button class="pri adm" id="opNew">+ Новое открытие</button></div></div>
       <div class="grid" id="opList"></div>
     </section>
   </div>
@@ -119,12 +121,22 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}di
   <div class="row"><button id="ocancel">Отмена</button><button class="pri" id="osave">Сохранить</button></div>
 </dialog>
 
+<dialog id="impDlg">
+  <h2 id="impTitle">Импорт списком</h2>
+  <p class="hint" id="impHint"></p>
+  <textarea id="impTxt" placeholder="Вставьте сюда список"></textarea>
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <label class="hint" style="margin:0">Или файл .txt: <input type="file" id="impFile" accept=".txt,.csv,text/plain"></label>
+  </div>
+  <div class="row"><button id="impCancel">Отмена</button><button class="pri" id="impGo">Добавить</button></div>
+</dialog>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getFirestore,collection,onSnapshot,addDoc,updateDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",authDomain:"krd-tracker.firebaseapp.com",projectId:"krd-tracker",storageBucket:"krd-tracker.firebasestorage.app",messagingSenderId:"506382681336",appId:"1:506382681336:web:e093bf1daba1656685270d"});
-const db=getFirestore(app),auth=getAuth(app),MAIL="@krd-tracker.app";
+const db=getFirestore(app),auth=getAuth(app),MAIL="@krd.ru";
 const TASKS=[["maket","Подготовка макета"],["pkd","Заливка и настройка ПКД"],["server","Заливка и настройка сервера"],["rmaster","Роутер мастер"],["rreserve","Роутер резерв"],["recon","Сверка сервера"],["kkm","Регистрация ККМ"],["tbo","Регистрация ТБО"],["egais","Ключ ЕГАИС"],["uks","Сборка УКС на магазине"],["kassy","Сборка касс"],["kso","Сборка КСО"],["ap","Установка точек доступа"]];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -195,6 +207,29 @@ $("ocancel").onclick=()=>$("opDlg").close();
 $("osave").onclick=async()=>{const d={name:$("f_name").value.trim(),date:$("f_date").value,addr:$("f_addr").value.trim(),resp:$("f_resp").value.trim(),fact:$("f_fact").value.trim()};
   if(!d.name||!d.date){alert("Укажите название и дату");return}
   if(editId)await updateDoc(doc(db,"openings",editId),d);else await addDoc(collection(db,"openings"),{...d,tasks:{}});$("opDlg").close()};
+
+let impMode="to";
+function openImp(m){impMode=m;
+  $("impTitle").textContent=m==="to"?"Импорт магазинов для ТО":"Импорт открытий";
+  $("impHint").textContent=m==="to"
+   ?"По одному магазину в строке (можно скопировать столбец из Excel). Добавятся в выбранный месяц, повторы пропускаются."
+   :"Одна строка — одно открытие. Столбцы из Excel по порядку: название, дата (25.10.2026), адрес, ответственный. Если даты нет, ставится 1 число выбранного месяца.";
+  $("impTxt").value="";$("impDlg").showModal()}
+$("toImp").onclick=()=>openImp("to");
+$("opImp").onclick=()=>openImp("op");
+$("impCancel").onclick=()=>$("impDlg").close();
+$("impFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await f.arrayBuffer();
+  try{$("impTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("impTxt").value=new TextDecoder("windows-1251").decode(b)}e.target.value=""};
+const pd=v=>{v=(v||"").trim();let m=v.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})$/);
+  if(m)return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:""};
+$("impGo").onclick=async()=>{
+  const lines=$("impTxt").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!lines.length)return;
+  const k=key(cur);let jobs=[];
+  if(impMode==="to"){const ex=new Set(toAll.filter(x=>x.month===k).map(x=>x.name.toLowerCase()));
+    for(const n of lines){if(ex.has(n.toLowerCase()))continue;ex.add(n.toLowerCase());jobs.push(addDoc(collection(db,"to_stores"),{name:n,month:k,done:false}))}}
+  else for(const l of lines){const c=l.split(/\t|;/).map(x=>x.trim());if(!c[0])continue;
+    jobs.push(addDoc(collection(db,"openings"),{name:c[0],date:pd(c[1])||k+"-01",addr:c[2]||"",resp:c[3]||"",fact:"",tasks:{}}))}
+  try{await Promise.all(jobs);$("impDlg").close();alert("Добавлено: "+jobs.length)}catch(e){alert("Ошибка записи. Проверьте, что вы вошли как админ")}};
 
 document.addEventListener("toggle",e=>{const id=e.target.dataset?.id;if(id)e.target.open?opened.add(id):opened.delete(id)},true);
 document.addEventListener("click",async e=>{const g=a=>e.target.dataset[a];
