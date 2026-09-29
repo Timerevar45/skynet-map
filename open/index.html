@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трекер объектов | KRD Logistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-size: 0.9rem; }
+        .stage-btn { width: 100%; margin-bottom: 2px; font-size: 0.8rem; padding: 4px; border: none; border-radius: 4px; color: white; transition: 0.2s;}
+        .btn-pending { background-color: #6c757d; }
+        .btn-done { background-color: #198754; }
+        .bg-success-soft { background-color: #d1e7dd !important; }
+        #app-screen { display: none; }
+        .readonly-btn { pointer-events: none; opacity: 0.8; }
+        .table th, .table td { vertical-align: middle; padding: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Экран входа -->
+    <div id="login-screen" class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+        <div class="card p-4 shadow" style="width: 350px;">
+            <h4 class="text-center mb-4">Вход в панель</h4>
+            <input type="text" id="login-input" class="form-control mb-2" placeholder="Логин">
+            <input type="password" id="password-input" class="form-control mb-3" placeholder="Пароль">
+            <button id="btn-login" class="btn btn-primary w-100 mb-2">Войти как Админ</button>
+            <button id="btn-guest" class="btn btn-outline-secondary w-100">Войти как Гость (Просмотр)</button>
+            <div id="login-error" class="text-danger text-center mt-2" style="display: none;">Неверные данные</div>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="app-screen" class="container-fluid py-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Панель управления объектами</h2>
+            <div>
+                <span id="user-role-badge" class="badge bg-primary me-3 fs-6"></span>
+                <button id="btn-logout" class="btn btn-sm btn-outline-danger">Выйти</button>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            <!-- ЛЕВАЯ ЧАСТЬ: Плановое ТО -->
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark text-white fw-bold">🛠 Плановое ТО</div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="admin-only mb-3">
+                            <label class="form-label text-muted small">Вставьте список из блокнота (по 1 в строку):</label>
+                            <textarea id="maintenance-list" class="form-control mb-2" rows="4" placeholder="Магазин 1&#10;Магазин 2"></textarea>
+                            <button id="btn-add-maintenance" class="btn btn-sm btn-primary w-100">Загрузить список</button>
+                        </div>
+                        <div class="table-responsive flex-grow-1" style="max-height: 60vh; overflow-y: auto;">
+                            <table class="table table-sm table-hover text-center">
+                                <tbody id="maintenance-tbody">
+                                    <!-- Генерация ТО -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПРАВАЯ ЧАСТЬ: Открытия -->
+            <div class="col-md-9">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white fw-bold">🚀 Открытия магазинов</div>
+                    <div class="card-body">
+                        
+                        <!-- Форма добавления открытия -->
+                        <div class="admin-only row g-2 mb-3 align-items-end">
+                            <div class="col-md-3">
+                                <input type="text" id="op-name" class="form-control form-control-sm" placeholder="Адрес магазина">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date" id="op-date" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" id="op-resp" class="form-control form-control-sm" placeholder="Ответственный">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" id="op-assembler" class="form-control form-control-sm" placeholder="Сборщик">
+                            </div>
+                            <div class="col-md-2">
+                                <button id="btn-add-open" class="btn btn-sm btn-success w-100">Добавить</button>
+                            </div>
+                        </div>
+
+                        <!-- Таблица открытий -->
+                        <div class="table-responsive border rounded" style="max-height: 65vh; overflow-y: auto;">
+                            <table class="table table-sm table-bordered table-hover mb-0 text-center text-nowrap">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Объект</th>
+                                        <th>Дата</th>
+                                        <th>Команда</th>
+                                        <th>ККТ</th>
+                                        <th>Пинпады</th>
+                                        <th>ЕГАИС</th>
+                                        <th>Сверка</th>
+                                        <th>ПКД</th>
+                                        <th>Сервер</th>
+                                        <th>Кассы</th>
+                                        <th>УКС</th>
+                                        <th>ТД</th>
+                                        <th class="admin-only">Удалить</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="openings-tbody">
+                                    <!-- Генерация открытий -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE И ЛОГИКА -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Ключи из скриншота
+        const firebaseConfig = {
+            apiKey: "AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",
+            authDomain: "krd-tracker.firebaseapp.com",
+            projectId: "krd-tracker",
+            storageBucket: "krd-tracker.firebasestorage.app",
+            messagingSenderId: "506382681336",
+            appId: "1:506382681336:web:e093bf1daba1656685270d",
+            measurementId: "G-2ET577W13G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // УЧЕТНЫЕ ЗАПИСИ
+        const ADMINS = {
+            'docenko_n_v': 'AAAAaaaa5555',
+            'karasev_vd': 'VVVVvvvv5555'
+        };
+
+        const stages = ['kkt', 'pinpads', 'egais', 'maket', 'pkd', 'server', 'kassy', 'uks', 'td'];
+        let isAdmin = false;
+
+        document.getElementById('btn-login').onclick = () => {
+            const l = document.getElementById('login-input').value;
+            const p = document.getElementById('password-input').value;
+            if (ADMINS[l] && ADMINS[l] === p) {
+                sessionStorage.setItem('krd_role', 'admin');
+                sessionStorage.setItem('krd_user', l);
+                initApp();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        };
+
+        document.getElementById('btn-guest').onclick = () => {
+            sessionStorage.setItem('krd_role', 'guest');
+            initApp();
+        };
+
+        document.getElementById('btn-logout').onclick = () => {
+            sessionStorage.removeItem('krd_role');
+            location.reload();
+        };
+
+        if (sessionStorage.getItem('krd_role')) initApp();
+
+        function initApp() {
+            isAdmin = sessionStorage.getItem('krd_role') === 'admin';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            
+            document.getElementById('user-role-badge').innerText = isAdmin ? 
+                `Администратор: ${sessionStorage.getItem('krd_user')}` : 'Режим гостя (Только просмотр)';
+
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = isAdmin ? '' : 'none';
+            });
+
+            loadMaintenance();
+            loadOpenings();
+        }
+
+        // ЛОГИКА ТО (ЛЕВАЯ КОЛОНКА)
+        document.getElementById('btn-add-maintenance').onclick = async () => {
+            const text = document.getElementById('maintenance-list').value;
+            if (!text.trim()) return;
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            for (let name of lines) {
+                await addDoc(collection(db, "maintenance"), { name: name.trim(), done: false, createdAt: serverTimestamp() });
+            }
+            document.getElementById('maintenance-list').value = '';
+        };
+
+        window.toggleMaint = async (id, currentStatus) => {
+            if (!isAdmin) return;
+            await updateDoc(doc(db, "maintenance", id), { done: !currentStatus });
+        };
+
+        window.deleteMaint = async (id) => {
+            if (!isAdmin || !confirm('Удалить ТО?')) return;
+            await deleteDoc(doc(db, "maintenance", id));
+        };
+
+        function loadMaintenance() {
+            const q = query(collection(db, "maintenance"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('maintenance-tbody');
+                tbody.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const btnClass = data.done ? 'btn-success' : 'btn-secondary';
+                    const btnText = data.done ? 'ТО Проведено' : 'В работе';
+                    const disabled = isAdmin ? '' : 'readonly-btn';
+                    
+                    let tr = `<tr>
+                        <td class="text-start fw-bold ${data.done ? 'text-decoration-line-through text-muted' : ''}">${data.name}</td>
+                        <td style="width: 120px;">
+                            <button onclick="toggleMaint('${docSnap.id}', ${data.done})" class="stage-btn ${btnClass} ${disabled}">${btnText}</button>
+                        </td>`;
+                    if (isAdmin) tr += `<td><button onclick="deleteMaint('${docSnap.id}')" class="btn btn-sm btn-outline-danger border-0">❌</button></td>`;
+                    tr += `</tr>`;
+                    tbody.innerHTML += tr;
+                });
+            });
+        }
+
+        // ЛОГИКА ОТКРЫТИЙ (ПРАВАЯ КОЛОНКА)
+        document.getElementById('btn-add-open').onclick = async () => {
+            const name = document.getElementById('op-name').value;
+            const date = document.getElementById('op-date').value;
+            if (!name || !date) return alert("Нужен адрес и дата!");
+            
+            const newDoc = {
+                name, date, 
+                resp: document.getElementById('op-resp').value || '-',
+                assembler: document.getElementById('op-assembler').value || '-',
+                createdAt: serverTimestamp()
+            };
+            stages.forEach(s => newDoc[s] = false);
+            
+            await addDoc(collection(db, "openings"), newDoc);
+            
+            ['op-name', 'op-date', 'op-resp', 'op-assembler'].forEach(id => document.getElementById(id).value = '');
+        };
+
+        window.toggleStage = async (id, field, current) => {
+            if (!isAdmin) return;
+            await updateDoc(doc(db, "openings", id), { [field]: !current });
+        };
+
+        window.deleteOp = async (id) => {
+            if (!isAdmin || !confirm('Точно удалить объект?')) return;
+            await deleteDoc(doc(db, "openings", id));
+        };
+
+        function loadOpenings() {
+            const q = query(collection(db, "openings"), orderBy("date", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('openings-tbody');
+                tbody.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const isAllDone = stages.every(s => d[s] === true);
+                    const rowClass = isAllDone ? 'bg-success-soft' : '';
+                    const disabled = isAdmin ? '' : 'readonly-btn';
+
+                    let html = `<tr class="${rowClass}">
+                        <td class="fw-bold text-start">${d.name}</td>
+                        <td>${d.date}</td>
+                        <td class="small text-muted text-start">Отв: ${d.resp}<br>Сб: ${d.assembler}</td>`;
+                    
+                    stages.forEach(s => {
+                        const statusClass = d[s] ? 'btn-done' : 'btn-pending';
+                        html += `<td><button onclick="toggleStage('${docSnap.id}', '${s}', ${d[s]})" class="stage-btn ${statusClass} ${disabled}">${d[s] ? 'Готово' : 'В работе'}</button></td>`;
+                    });
+
+                    if (isAdmin) {
+                        html += `<td><button onclick="deleteOp('${docSnap.id}')" class="btn btn-sm btn-outline-danger border-0">❌</button></td>`;
+                    }
+                    html += `</tr>`;
+                    tbody.innerHTML += html;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
