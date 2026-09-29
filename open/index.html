@@ -1,265 +1,209 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRD Logistics - Трекер открытий и ТО</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Плавные переходы */
-        .transition-all { transition: all 0.3s ease; }
-        dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(3px); }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>КРД · Открытия и ТО</title>
+<style>
+:root{--bg:#0d1117;--p:#161b22;--p2:#1c232c;--ink:#e6edf3;--mute:#8b98a5;--line:#2a323c;--acc:#f0a30a;--ok:#3fb950;--bad:#f85149;--okbg:#12261a;--badbg:#2d1517}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,system-ui,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font-weight:800;font-size:19px;letter-spacing:.5px}.logo b{color:var(--acc)}
+.sp{flex:1}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--p2);color:var(--ink);border-radius:6px;padding:7px 13px}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.pri{background:var(--acc);border-color:var(--acc);color:#1a1200;font-weight:700}
+.dng{color:var(--bad)}
+.who{color:var(--mute);font-size:13px}
+.month{display:flex;align-items:center;gap:6px}
+.month span{min-width:150px;text-align:center;font-size:17px;font-weight:700;text-transform:capitalize}
+.wrap{max-width:1500px;margin:0 auto;padding:20px 24px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.k{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px}
+.ring{--v:0;--c:var(--ok);width:74px;height:74px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),var(--line) 0)}
+.ring i{width:56px;height:56px;border-radius:50%;background:var(--p);display:grid;place-items:center;font:700 17px/1 "Segoe UI",sans-serif;font-style:normal}
+.big{font-size:38px;font-weight:800;line-height:1;width:74px;text-align:center;flex:none}
+.k h4{margin:0;font-size:13px;color:var(--mute);font-weight:600}
+.k p{margin:3px 0 0;font-size:15px;font-weight:600}
+.cols{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.side{display:grid;gap:18px}
+section{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:16px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+h2{margin:0;font-size:15px;font-weight:700}
+.cnt{color:var(--mute);font-size:13px}
+.bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:4px;transition:width .3s}
+.to{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-top:6px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad)}
+.to.done{background:var(--okbg);border-left-color:var(--ok)}
+.to .n{flex:1}.to.done .n{color:var(--mute);text-decoration:line-through}
+.to em{font-style:normal;font-size:12px;font-weight:700;color:var(--bad)}.to.done em{color:var(--ok)}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);flex:none}
+input[disabled]{opacity:1}
+.add{display:none;gap:8px;margin-top:12px}body.admin .add{display:flex}
+input[type=text],input[type=date],input[type=password]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.st{display:grid;grid-template-columns:1fr 46px;gap:2px 10px;margin-top:9px;font-size:13px}
+.st .bar{grid-column:1/-1;height:5px}.st b{text-align:right}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.card{background:var(--p2);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:14px}
+.card.over{border-top-color:var(--bad)}.card.full{border-top-color:var(--ok)}
+.top{display:flex;gap:12px;align-items:flex-start}
+.top .ring{width:58px;height:58px}.top .ring i{width:44px;height:44px;font-size:13px;background:var(--p2)}
+.top h3{margin:0;font-size:16px}
+.date{font-weight:700;color:var(--acc)}.over .date{color:var(--bad)}
+.meta{margin:10px 0;color:var(--mute);font-size:13px;display:grid;gap:2px}.meta b{color:var(--ink);font-weight:600}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--mute);font-size:13px}
+.tasks{display:grid;margin-top:6px}
+.tasks label{display:flex;gap:9px;align-items:center;padding:4px 4px;border-radius:5px}
+.tasks label:hover{background:var(--p)}.tasks .d{color:var(--mute);text-decoration:line-through}
+.acts{display:flex;gap:8px;margin-top:10px}
+.empty{color:var(--mute);padding:18px 0;text-align:center}
+.adm{display:none}body.admin .adm{display:inline-block}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--p);color:var(--ink);padding:20px;width:min(440px,92vw)}
+dialog::backdrop{background:#000a}
+dialog h2{font-size:17px}
+dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}dialog label.f input{margin-top:3px}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.err{color:var(--bad);min-height:18px;margin-top:8px;font-size:13px}
+</style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
+<body>
+<header>
+  <div class="logo">КРД<b>.</b>ОТКРЫТИЯ</div>
+  <button id="loginBtn" class="pri">Вход для админа</button>
+  <span class="who" id="who"></span>
+  <button id="logoutBtn" class="adm">Выйти</button>
+  <div class="sp"></div>
+  <div class="month"><button id="prev" aria-label="Предыдущий месяц">‹</button><span id="mlabel"></span><button id="next" aria-label="Следующий месяц">›</button></div>
+</header>
+<div class="wrap">
+  <div class="kpi" id="kpi"></div>
+  <div class="cols">
+    <div class="side">
+      <section>
+        <div class="hd"><h2>ТО на месяц</h2><span class="cnt" id="toCnt"></span></div>
+        <div class="bar"><i id="toBar"></i></div>
+        <div id="toList"></div>
+        <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">Добавить</button></div>
+      </section>
+      <section>
+        <div class="hd"><h2>Этапы по всем открытиям</h2></div>
+        <div id="stages"></div>
+      </section>
+    </div>
+    <section>
+      <div class="hd"><h2>Открытия магазинов</h2><button class="pri adm" id="opNew">+ Новое открытие</button></div>
+      <div class="grid" id="opList"></div>
+    </section>
+  </div>
+</div>
 
-    <!-- Навигация -->
-    <header class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
-        <div class="text-xl font-bold flex items-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Панель управления ИТ
-        </div>
-        <div id="auth-section" class="flex items-center gap-4">
-            <span id="user-info" class="hidden text-sm text-blue-200"></span>
-            <button id="btn-login-modal" class="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded text-sm transition-all">Вход для админа</button>
-            <button id="btn-logout" class="hidden bg-red-600 hover:bg-red-500 px-4 py-2 rounded text-sm transition-all">Выйти</button>
-        </div>
-    </header>
+<dialog id="loginDlg">
+  <h2>Вход для админа</h2>
+  <label class="f">Логин<input type="text" id="lu" autocomplete="username"></label>
+  <label class="f">Пароль<input type="password" id="lp" autocomplete="current-password"></label>
+  <div class="err" id="lerr"></div>
+  <div class="row"><button id="lcancel">Отмена</button><button class="pri" id="lgo">Войти</button></div>
+</dialog>
+<dialog id="opDlg">
+  <h2 id="opTitle">Открытие магазина</h2>
+  <label class="f">Название магазина<input type="text" id="f_name"></label>
+  <label class="f">Дата открытия<input type="date" id="f_date"></label>
+  <label class="f">Адрес<input type="text" id="f_addr"></label>
+  <label class="f">Ответственный<input type="text" id="f_resp"></label>
+  <label class="f">Кто собирает по факту (отпуск, больничный)<input type="text" id="f_fact"></label>
+  <div class="row"><button id="ocancel">Отмена</button><button class="pri" id="osave">Сохранить</button></div>
+</dialog>
 
-    <main class="p-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- ЛЕВАЯ КОЛОНКА: ТО -->
-        <section class="lg:col-span-1 bg-white rounded-lg shadow p-5 border-t-4 border-blue-500 h-fit">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-700">ТО на <span id="current-month" class="capitalize text-blue-600"></span></h2>
-                <button id="btn-add-to" class="hidden bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600">+</button>
-            </div>
-            <div id="to-list" class="flex flex-col gap-2">
-                <!-- Загрузка ТО -->
-                <p class="text-gray-400 text-sm">Загрузка данных...</p>
-            </div>
-        </section>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,collection,onSnapshot,addDoc,updateDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const app=initializeApp({apiKey:"AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",authDomain:"krd-tracker.firebaseapp.com",projectId:"krd-tracker",storageBucket:"krd-tracker.firebasestorage.app",messagingSenderId:"506382681336",appId:"1:506382681336:web:e093bf1daba1656685270d"});
+const db=getFirestore(app),auth=getAuth(app),MAIL="@krd-tracker.app";
+const TASKS=[["maket","Подготовка макета"],["pkd","Заливка и настройка ПКД"],["server","Заливка и настройка сервера"],["rmaster","Роутер мастер"],["rreserve","Роутер резерв"],["recon","Сверка сервера"],["kkm","Регистрация ККМ"],["tbo","Регистрация ТБО"],["egais","Ключ ЕГАИС"],["uks","Сборка УКС на магазине"],["kassy","Сборка касс"],["kso","Сборка КСО"],["ap","Установка точек доступа"]];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+let cur=new Date();cur.setDate(1);
+let admin=false,toAll=[],opAll=[],editId=null;const opened=new Set();
+const ring=(p,c)=>`<div class="ring" style="--v:${p};--c:${c||"var(--ok)"}"><i>${p}%</i></div>`;
+const done=x=>TASKS.filter(([k])=>(x.tasks||{})[k]).length;
 
-        <!-- ПРАВАЯ КОЛОНКА: Открытия -->
-        <section class="lg:col-span-2 bg-white rounded-lg shadow p-5 border-t-4 border-purple-500">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-700">Открытия магазинов</h2>
-                <button id="btn-add-open" class="hidden bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">Добавить открытие</button>
-            </div>
-            <div id="openings-list" class="grid grid-cols-1 gap-6">
-                 <!-- Загрузка открытий -->
-            </div>
-        </section>
-    </main>
+function render(){
+  const k=key(cur),today=new Date().toISOString().slice(0,10);
+  $("mlabel").textContent=cur.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
+  const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
+  const op=opAll.filter(x=>(x.date||"").startsWith(k)).sort((a,b)=>a.date.localeCompare(b.date));
+  const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
+  const ps=op.map(x=>Math.round(done(x)/TASKS.length*100));
+  const avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):0;
+  const ready=ps.filter(p=>p===100).length,over=op.filter((x,i)=>x.date<today&&ps[i]<100).length;
 
-    <!-- Модальное окно авторизации -->
-    <dialog id="login-modal" class="p-6 rounded-lg shadow-xl border-0 w-96">
-        <h3 class="text-lg font-bold mb-4">Вход в панель</h3>
-        <input type="text" id="login-username" placeholder="Логин (например, docenko_n_v)" class="w-full border p-2 rounded mb-3">
-        <input type="password" id="login-password" placeholder="Пароль" class="w-full border p-2 rounded mb-4">
-        <div class="flex justify-end gap-2">
-            <button onclick="document.getElementById('login-modal').close()" class="px-4 py-2 text-gray-500">Отмена</button>
-            <button id="btn-submit-login" class="px-4 py-2 bg-blue-600 text-white rounded">Войти</button>
-        </div>
-    </dialog>
+  $("kpi").innerHTML=`
+   <div class="k">${ring(toP)}<div><h4>ТО выполнено</h4><p>${dn} из ${to.length}</p></div></div>
+   <div class="k">${ring(avg,"var(--acc)")}<div><h4>Готовность открытий</h4><p>в среднем по месяцу</p></div></div>
+   <div class="k"><div class="big">${op.length}</div><div><h4>Открытий в месяце</h4><p>полностью готово: ${ready}</p></div></div>
+   <div class="k"><div class="big" style="color:${over?"var(--bad)":"var(--ok)"}">${over}</div><div><h4>Просрочено</h4><p>дата прошла, этапы не закрыты</p></div></div>`;
 
-    <!-- Модальное окно добавления ТО -->
-    <dialog id="modal-add-to" class="p-6 rounded-lg shadow-xl border-0 w-96">
-        <h3 class="text-lg font-bold mb-4">Добавить магазин на ТО</h3>
-        <input type="text" id="new-to-name" placeholder="Номер/Название магазина" class="w-full border p-2 rounded mb-4">
-        <div class="flex justify-end gap-2">
-            <button onclick="document.getElementById('modal-add-to').close()" class="px-4 py-2 text-gray-500">Отмена</button>
-            <button id="btn-save-to" class="px-4 py-2 bg-green-600 text-white rounded">Добавить</button>
-        </div>
-    </dialog>
+  $("toCnt").textContent=to.length?`${toP}%`:"";
+  $("toBar").style.width=toP+"%";
+  $("toList").innerHTML=to.map(x=>`<div class="to ${x.done?"done":""}">
+   <input type="checkbox" ${x.done?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено">
+   <span class="n">${esc(x.name)}</span><em>${x.done?"выполнено":"не выполнено"}</em>
+   ${admin?`<button class="dng" data-delto="${x.id}" title="Убрать">✕</button>`:""}</div>`).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
 
-    <!-- Модальное окно добавления Открытия -->
-    <dialog id="modal-add-open" class="p-6 rounded-lg shadow-xl border-0 w-[500px] max-w-full">
-        <h3 class="text-lg font-bold mb-4">Новое открытие</h3>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <input type="text" id="op-name" placeholder="Название магазина" class="col-span-2 border p-2 rounded">
-            <input type="date" id="op-date" class="border p-2 rounded">
-            <input type="text" id="op-address" placeholder="Адрес" class="border p-2 rounded">
-            <input type="text" id="op-resp" placeholder="Ответственный" class="border p-2 rounded">
-            <input type="text" id="op-fact" placeholder="Кто собирает (по факту)" class="border p-2 rounded">
-        </div>
-        <div class="flex justify-end gap-2 mt-4">
-            <button onclick="document.getElementById('modal-add-open').close()" class="px-4 py-2 text-gray-500">Отмена</button>
-            <button id="btn-save-open" class="px-4 py-2 bg-purple-600 text-white rounded">Создать карточку</button>
-        </div>
-    </dialog>
+  $("stages").innerHTML=op.length?`<div class="st">`+TASKS.map(([kk,l])=>{
+    const n=op.filter(x=>(x.tasks||{})[kk]).length,p=Math.round(n/op.length*100);
+    return `<span>${l}</span><b>${n}/${op.length}</b><div class="bar"><i style="width:${p}%;${p<100?"background:var(--acc)":""}"></i></div>`}).join("")+`</div>`
+    :`<div class="empty">Нет открытий в этом месяце</div>`;
 
-    <!-- Скрипты Firebase и логика -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+  $("opList").innerHTML=op.map((x,i)=>{
+    const t=x.tasks||{},p=ps[i],cls=p===100?"full":(x.date<today?"over":"");
+    return `<div class="card ${cls}">
+     <div class="top">${ring(p,p===100?"var(--ok)":x.date<today?"var(--bad)":"var(--acc)")}
+      <div><h3>${esc(x.name)}</h3><div class="date">${new Date(x.date).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div></div></div>
+     <div class="meta"><div>${esc(x.addr)}</div><div>Ответственный: <b>${esc(x.resp)||"—"}</b></div>${x.fact?`<div>Собирает по факту: <b>${esc(x.fact)}</b></div>`:""}</div>
+     <div class="bar"><i style="width:${p}%"></i></div>
+     <details data-id="${x.id}" ${opened.has(x.id)?"open":""}><summary>Этапы: ${done(x)} из ${TASKS.length}</summary>
+      <div class="tasks">${TASKS.map(([kk,l])=>`<label class="${t[kk]?"d":""}"><input type="checkbox" ${t[kk]?"checked":""} ${admin?"":"disabled"} data-op="${x.id}" data-k="${kk}">${l}</label>`).join("")}</div></details>
+     ${admin?`<div class="acts"><button data-edit="${x.id}">Изменить</button><button class="dng" data-delop="${x.id}">Удалить</button></div>`:""}</div>`}).join("")||`<div class="empty">Открытий на этот месяц нет</div>`;
+}
 
-        // Конфигурация
-        const firebaseConfig = {
-            apiKey: "AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",
-            authDomain: "krd-tracker.firebaseapp.com",
-            projectId: "krd-tracker",
-            storageBucket: "krd-tracker.firebasestorage.app",
-            messagingSenderId: "506382681336",
-            appId: "1:506382681336:web:e093bf1daba1656685270d",
-            measurementId: "G-2ET577W13G"
-        };
+onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
+onSnapshot(collection(db,"openings"),s=>{opAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
+onAuthStateChanged(auth,u=>{admin=!!u;document.body.classList.toggle("admin",admin);$("loginBtn").style.display=admin?"none":"";$("who").textContent=u?u.email.replace(MAIL,""):"";render()});
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+$("prev").onclick=()=>{cur.setMonth(cur.getMonth()-1);render()};
+$("next").onclick=()=>{cur.setMonth(cur.getMonth()+1);render()};
+$("loginBtn").onclick=()=>{$("lerr").textContent="";$("loginDlg").showModal()};
+$("lcancel").onclick=()=>$("loginDlg").close();
+$("lgo").onclick=async()=>{try{await signInWithEmailAndPassword(auth,$("lu").value.trim().toLowerCase()+MAIL,$("lp").value);$("lp").value="";$("loginDlg").close()}catch(e){$("lerr").textContent="Неверный логин или пароль"}};
+$("lp").onkeydown=e=>{if(e.key==="Enter")$("lgo").click()};
+$("logoutBtn").onclick=()=>signOut(auth);
+$("toAdd").onclick=async()=>{const n=$("toName").value.trim();if(!n)return;await addDoc(collection(db,"to_stores"),{name:n,month:key(cur),done:false});$("toName").value=""};
+$("toName").onkeydown=e=>{if(e.key==="Enter")$("toAdd").click()};
 
-        let isAdmin = false;
+function openOp(x){editId=x?x.id:null;$("opTitle").textContent=x?"Изменить открытие":"Новое открытие";
+  $("f_name").value=x?.name||"";$("f_date").value=x?.date||key(cur)+"-01";$("f_addr").value=x?.addr||"";$("f_resp").value=x?.resp||"";$("f_fact").value=x?.fact||"";$("opDlg").showModal()}
+$("opNew").onclick=()=>openOp();
+$("ocancel").onclick=()=>$("opDlg").close();
+$("osave").onclick=async()=>{const d={name:$("f_name").value.trim(),date:$("f_date").value,addr:$("f_addr").value.trim(),resp:$("f_resp").value.trim(),fact:$("f_fact").value.trim()};
+  if(!d.name||!d.date){alert("Укажите название и дату");return}
+  if(editId)await updateDoc(doc(db,"openings",editId),d);else await addDoc(collection(db,"openings"),{...d,tasks:{}});$("opDlg").close()};
 
-        // Настройка текущего месяца
-        const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
-        document.getElementById('current-month').innerText = months[new Date().getMonth()];
-
-        // Этапы сборки
-        const stepsConfig = [
-            { id: "pkd", label: "ПКД (заливка/настройка)" },
-            { id: "server", label: "Сервер (заливка/настройка)" },
-            { id: "routerRes", label: "Роутер Резерв" },
-            { id: "routerMas", label: "Роутер Мастер" },
-            { id: "sverka", label: "Сверка сервера" },
-            { id: "kkm", label: "Регистрация ККМ" },
-            { id: "tbo", label: "Регистрация ТБО (Пинпады)" },
-            { id: "egais", label: "Выпуск ключа ЕГАИС" },
-            { id: "uks", label: "Сборка УКС" },
-            { id: "kassa", label: "Сборка касс" },
-            { id: "kso", label: "Сборка КСО" },
-            { id: "ap", label: "Установка точек доступа (ТД)" }
-        ];
-
-        // --- АВТОРИЗАЦИЯ ---
-        onAuthStateChanged(auth, (user) => {
-            isAdmin = !!user;
-            document.getElementById('btn-login-modal').classList.toggle('hidden', isAdmin);
-            document.getElementById('btn-logout').classList.toggle('hidden', !isAdmin);
-            document.getElementById('user-info').classList.toggle('hidden', !isAdmin);
-            document.getElementById('btn-add-to').classList.toggle('hidden', !isAdmin);
-            document.getElementById('btn-add-open').classList.toggle('hidden', !isAdmin);
-            
-            if(user) document.getElementById('user-info').innerText = user.email.split('@')[0];
-            renderUI(); // Перерисовать UI с учетом прав
-        });
-
-        document.getElementById('btn-login-modal').onclick = () => document.getElementById('login-modal').showModal();
-        
-        document.getElementById('btn-submit-login').onclick = async () => {
-            const u = document.getElementById('login-username').value + "@krd.ru";
-            const p = document.getElementById('login-password').value;
-            try {
-                await signInWithEmailAndPassword(auth, u, p);
-                document.getElementById('login-modal').close();
-            } catch (error) {
-                alert("Ошибка входа: проверьте логин и пароль");
-            }
-        };
-
-        document.getElementById('btn-logout').onclick = () => signOut(auth);
-
-        // --- ДАННЫЕ И РЕНДЕР ---
-        let toData = [];
-        let openingsData = [];
-
-        // Слушатель ТО
-        onSnapshot(query(collection(db, "maintenance"), orderBy("createdAt", "asc")), (snapshot) => {
-            toData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderUI();
-        });
-
-        // Слушатель Открытий
-        onSnapshot(query(collection(db, "openings"), orderBy("date", "asc")), (snapshot) => {
-            openingsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderUI();
-        });
-
-        function renderUI() {
-            // Рендер ТО
-            const toList = document.getElementById('to-list');
-            toList.innerHTML = toData.map(item => `
-                <div class="flex items-center p-3 rounded border ${item.done ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} transition-all">
-                    <input type="checkbox" ${item.done ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} 
-                        class="w-5 h-5 mr-3 cursor-pointer" 
-                        onchange="window.updateTO('${item.id}', this.checked)">
-                    <span class="font-medium ${item.done ? 'line-through text-gray-500' : 'text-red-700'}">${item.name}</span>
-                </div>
-            `).join('') || '<p class="text-gray-400 text-sm">Нет задач на этот месяц</p>';
-
-            // Рендер Открытий
-            const opList = document.getElementById('openings-list');
-            opList.innerHTML = openingsData.map(shop => `
-                <div class="border rounded-lg p-5 bg-gray-50 shadow-sm relative">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b">
-                        <div>
-                            <h3 class="text-xl font-bold text-purple-700">${shop.name}</h3>
-                            <p class="text-sm text-gray-600">📍 ${shop.address}</p>
-                            <p class="text-sm font-semibold mt-1">📅 Открытие: ${new Date(shop.date).toLocaleDateString('ru-RU')}</p>
-                        </div>
-                        <div class="text-sm bg-white p-3 rounded border">
-                            <p><span class="text-gray-500">Ответственный:</span> <b>${shop.responsible}</b></p>
-                            <p><span class="text-gray-500">Собирает по факту:</span> <b class="text-blue-600">${shop.actualAssembler || '---'}</b></p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        ${stepsConfig.map(step => `
-                            <label class="flex items-center space-x-2 text-sm cursor-pointer p-2 rounded hover:bg-gray-100 transition-all ${shop.tasks?.[step.id] ? 'bg-green-100 text-green-800' : 'bg-white border'}">
-                                <input type="checkbox" ${shop.tasks?.[step.id] ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} 
-                                    onchange="window.updateStep('${shop.id}', '${step.id}', this.checked)"
-                                    class="w-4 h-4 rounded text-purple-600">
-                                <span>${step.label}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-400 text-sm">Нет запланированных открытий</p>';
-        }
-
-        // Глобальные функции для чекбоксов
-        window.updateTO = async (id, isDone) => {
-            if(!isAdmin) return;
-            await updateDoc(doc(db, "maintenance", id), { done: isDone });
-        };
-
-        window.updateStep = async (shopId, stepId, isChecked) => {
-            if(!isAdmin) return;
-            await updateDoc(doc(db, "openings", shopId), { 
-                [`tasks.${stepId}`]: isChecked 
-            });
-        };
-
-        // --- ДОБАВЛЕНИЕ НОВЫХ ЗАПИСЕЙ ---
-        document.getElementById('btn-add-to').onclick = () => document.getElementById('modal-add-to').showModal();
-        document.getElementById('btn-save-to').onclick = async () => {
-            const name = document.getElementById('new-to-name').value;
-            if(!name) return;
-            await addDoc(collection(db, "maintenance"), { name, done: false, createdAt: serverTimestamp() });
-            document.getElementById('new-to-name').value = '';
-            document.getElementById('modal-add-to').close();
-        };
-
-        document.getElementById('btn-add-open').onclick = () => document.getElementById('modal-add-open').showModal();
-        document.getElementById('btn-save-open').onclick = async () => {
-            const data = {
-                name: document.getElementById('op-name').value,
-                date: document.getElementById('op-date').value,
-                address: document.getElementById('op-address').value,
-                responsible: document.getElementById('op-resp').value,
-                actualAssembler: document.getElementById('op-fact').value,
-                tasks: {},
-                createdAt: serverTimestamp()
-            };
-            if(!data.name || !data.date) return alert('Введите хотя бы название и дату');
-            
-            await addDoc(collection(db, "openings"), data);
-            document.getElementById('modal-add-open').close();
-            // Очистка полей
-            ['op-name','op-date','op-address','op-resp','op-fact'].forEach(id => document.getElementById(id).value = '');
-        };
-    </script>
+document.addEventListener("toggle",e=>{const id=e.target.dataset?.id;if(id)e.target.open?opened.add(id):opened.delete(id)},true);
+document.addEventListener("click",async e=>{const g=a=>e.target.dataset[a];
+  if(g("edit"))openOp(opAll.find(x=>x.id===g("edit")));
+  if(g("delop")&&confirm("Удалить открытие?"))await deleteDoc(doc(db,"openings",g("delop")));
+  if(g("delto")&&confirm("Убрать магазин из списка ТО?"))await deleteDoc(doc(db,"to_stores",g("delto")))});
+document.addEventListener("change",async e=>{const t=e.target;if(!admin)return;
+  if(t.dataset.to)await updateDoc(doc(db,"to_stores",t.dataset.to),{done:t.checked});
+  if(t.dataset.op)await updateDoc(doc(db,"openings",t.dataset.op),{["tasks."+t.dataset.k]:t.checked})});
+</script>
 </body>
 </html>
