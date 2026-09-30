@@ -42,7 +42,7 @@ h2{margin:0;font-size:15px}.cnt{color:var(--mute);font-size:13px;font-weight:400
 input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);flex:none}input[disabled]{opacity:1}
 .add{display:none;gap:8px;margin-top:10px}body.admin .add{display:flex}
 .adm{display:none}body.admin .adm{display:inline-block}
-input[type=text],input[type=password],select,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+input[type=text],input[type=password],input[type=date],select,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
 input[type=text],input[type=password],textarea{width:100%}
 textarea{min-height:160px;margin-top:8px}
 .fb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
@@ -76,6 +76,17 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
 .shh{display:flex;gap:8px;align-items:center}.bd{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--line);color:var(--mute)}
 .pv{font-size:13px;color:var(--mute);margin:4px 0 6px 25px}
 .sel{display:flex;flex-wrap:wrap;gap:8px;margin-left:25px}.sel label{font-size:12px;color:var(--mute);display:grid;gap:2px}.sel select{max-width:170px}
+.chg{outline:2px solid var(--acc);outline-offset:-2px;background:#3a2c0a!important}
+.del{opacity:.65;text-decoration:line-through;outline:2px dashed var(--bad);outline-offset:-2px}
+.tc.tdel{opacity:.6;outline:2px dashed var(--bad)}
+.it .lb{display:flex;gap:8px;align-items:center;flex:1;cursor:pointer}.it .x{padding:0 7px;border:none;background:transparent}
+#pbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:20;display:none;align-items:center;gap:12px;background:var(--p2);border:2px solid var(--acc);border-radius:12px;padding:10px 16px;box-shadow:0 8px 30px #000a;flex-wrap:wrap;justify-content:center}
+#pbar.on{display:flex}#pbar span{font-weight:600}
+dialog label.f input,dialog label.f select{width:100%}
+#cfmList{max-height:50vh;overflow:auto;padding-left:20px;margin:10px 0}#cfmList li{margin:3px 0}
+.lks{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:6px}
+.lk{padding:8px 12px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad);color:#ffb4ae}.lk b{color:#fff}.lk span{display:block;color:var(--mute);font-size:12px}
+.lkok{color:var(--ok);font-weight:700;padding:2px 0}#lkSec.alert{border-color:var(--bad)}
 </style>
 </head>
 <body>
@@ -86,7 +97,10 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
   <div class="sp"></div>
 </header>
 <div class="wrap">
-  <div class="kpi" id="kpi"></div>
+  <section id="lkSec" style="margin-bottom:16px;display:none">
+    <div class="hd"><h2>Статус основных каналов · <span id="lkDate"></span></h2><span class="cnt" id="lkSum"></span><span class="sp"></span><button class="adm" id="lkBtn">Загрузить IP</button></div>
+    <div class="lks" id="lkList"></div>
+  </section>
   <div class="cols">
     <section>
       <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт</button></div>
@@ -96,7 +110,7 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
       <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">+</button></div>
     </section>
     <section>
-      <div class="hd"><h2>Задачи <span class="cnt" id="tCnt"></span></h2><button class="pri adm" id="xlsBtn">Загрузить Excel</button><input type="file" id="xlsFile" accept=".xlsx,.xlsm,.xls" hidden></div>
+      <div class="hd"><h2>Задачи <span class="cnt" id="tCnt"></span></h2><div style="display:flex;gap:8px"><button class="adm" id="addBtn">+ Задача / объекты</button><button class="pri adm" id="xlsBtn">Загрузить Excel</button></div><input type="file" id="xlsFile" accept=".xlsx,.xlsm,.xls" hidden></div>
       <div class="fb">
         <input type="text" id="q" placeholder="Поиск по магазину или системотехнику">
         <select id="fr" aria-label="Системотехник"></select>
@@ -125,9 +139,31 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
   <div class="row"><button id="impCancel">Отмена</button><button class="pri" id="impGo">Добавить</button></div></dialog>
 
 <dialog id="xlsDlg" class="wide"><h2>Какие листы использовать?</h2>
-  <p class="hint">Скрытые листы и сводные сняты по умолчанию. Столбцы определены автоматически, при ошибке поправьте вручную. Статус берётся из столбца «Статус»; если его нет, объект считается выполненным, когда дата уже наступила. Загрузка заменяет данные этих листов на сайте.</p>
+  <p class="hint">Скрытые листы и сводные сняты по умолчанию. Столбцы определены автоматически, при ошибке поправьте вручную. Статус берётся из столбца «Статус»; если его нет, объект считается выполненным, когда дата уже наступила. «Общий срок» задаёт одну дату на всю задачу (например, до 20 ноября), на выполнение он не влияет. Загрузка заменяет данные этих листов на сайте.</p>
   <div id="xlsList"></div>
   <div class="row"><button id="xlsCancel">Отмена</button><button class="pri" id="xlsGo">Загрузить выбранные</button></div></dialog>
+
+<dialog id="lkDlg"><h2>Основные каналы: магазины и IP</h2>
+  <p class="hint">Два столбца из Excel (название магазина и IP основного канала) или файл .xlsx / .txt. Повторная загрузка обновляет IP у существующих магазинов. IP видны только админам.</p>
+  <textarea id="lkTxt" placeholder="Отлив&#9;10.20.30.40"></textarea>
+  <label class="hint">Или файл: <input type="file" id="lkFile" accept=".xlsx,.xls,.txt,.csv"></label>
+  <div class="hint" id="lkCnt"></div>
+  <div class="row"><button id="lkCancel">Отмена</button><button class="pri" id="lkGo">Загрузить</button></div></dialog>
+
+<div id="pbar"><span id="pcnt"></span><button id="pundo">Отменить все</button><button class="pri" id="papply">Применить изменения</button></div>
+
+<dialog id="addDlg"><h2>Добавить задачу / объекты</h2>
+  <label class="f">Задача<select id="aTask"></select></label>
+  <label class="f" id="aNameW">Название новой задачи<input type="text" id="aName"></label>
+  <label class="f">Общий срок (необязательно, например «до 20 ноября»)<input type="date" id="aDl"></label>
+  <label class="f">Объекты, по одному в строке<textarea id="aRows" placeholder="Магазин ; Ответственный ; Статус (да/нет) ; Дата"></textarea></label>
+  <p class="hint">Обязателен только магазин. Остальное по порядку через Tab или «;» (можно скопировать несколько столбцов из Excel). Статус «да», «готово» или «выполнено» значит выполнено. Несколько магазинов можно вставить разом.</p>
+  <div class="err" id="aerr"></div>
+  <div class="row"><button id="aCancel">Отмена</button><button class="pri" id="aGo">Добавить</button></div></dialog>
+
+<dialog id="cfmDlg" class="wide"><h2>Применить эти изменения?</h2>
+  <ul id="cfmList"></ul>
+  <div class="row"><button id="cfmNo">Назад</button><button class="pri" id="cfmYes">Подтвердить и применить</button></div></dialog>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -141,7 +177,7 @@ const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 const col=p=>p>=80?"var(--ok)":p>=40?"var(--acc)":"var(--bad)";
 const ring=p=>`<div class="ring" style="--v:${p};--c:${col(p)}"><i>${p}%</i></div>`;
 let cur=new Date();cur.setDate(1);
-let admin=false,toAll=[],tasks=[],xs=[];const opened=new Set();
+let admin=false,toAll=[],tasks=[],xs=[],P={};const opened=new Set();
 
 /* Фильтры хранятся ТОЛЬКО в этом браузере, у других посетителей они не меняются */
 let S={q:"",resp:"",sort:"file",only:false};
@@ -154,17 +190,17 @@ function render(){
   const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
   const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
   $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
-  $("toList").innerHTML=to.map(x=>`<div class="to ${x.done?"done":""}"><input type="checkbox" ${x.done?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено"><span class="n">${esc(x.name)}</span><em>${x.done?"выполнено":"не выполнено"}</em>${admin?`<button class="dng" data-delto="${x.id}" title="Убрать">✕</button>`:""}</div>`).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
+  $("toList").innerHTML=to.map(x=>{const pv=P["to:"+x.id],v=pv?pv.v:x.done,dl=P["dt:"+x.id];
+    return `<div class="to ${v?"done":""} ${pv?"chg":""} ${dl?"del":""}"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено"><span class="n">${esc(x.name)}</span><em>${v?"выполнено":"не выполнено"}</em>${admin?`<button class="${dl?"":"dng"}" data-delto="${x.id}" title="Убрать из списка">${dl?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
 
-  const all=tasks.flatMap(t=>t.items),ad=all.filter(x=>x.d).length,ap=all.length?Math.round(ad/all.length*100):0;
-  $("kpi").innerHTML=`<div class="k">${ring(toP)}<div><h4>ТО выполнено</h4><p>${dn} из ${to.length}</p></div></div>
-   <div class="k">${ring(ap)}<div><h4>Задачи в целом</h4><p>${ad} из ${all.length} объектов</p></div></div>
-   <div class="k"><div class="big">${tasks.length}</div><div><h4>Задач в работе</h4><p>завершено: ${tasks.filter(t=>t.items.length&&t.items.every(x=>x.d)).length}</p></div></div>
-   <div class="k"><div class="big" style="color:${all.length-ad?"var(--acc)":"var(--ok)"}">${all.length-ad}</div><div><h4>Осталось объектов</h4><p>по всем задачам</p></div></div>`;
   renderTasks();
+  const n=Object.keys(P).length;$("pbar").classList.toggle("on",admin&&n>0);$("pcnt").textContent="Изменений не применено: "+n;
 }
 
+const dlTxt=(dl,left)=>{if(!dl)return"";const d=new Date(dl+"T12:00:00"),n=Math.round((d-new Date().setHours(12,0,0,0))/864e5),tx="до "+d.toLocaleDateString("ru-RU");
+  return !left?tx:n<0?`<span style="color:var(--bad)">${tx} · просрочено на ${-n} дн.</span>`:n===0?`${tx} · сегодня`:`${tx} · осталось ${n} дн.`};
 function renderTasks(){
+  const sc={};document.querySelectorAll(".lst").forEach(l=>{sc[l.dataset.for]=l.scrollTop});
   const rs=[...new Set(tasks.flatMap(t=>t.items.map(x=>x.r)))].sort((a,b)=>a.localeCompare(b,"ru"));
   $("fr").innerHTML=`<option value="">Все системотехники</option>`+rs.map(r=>`<option ${r===S.resp?"selected":""}>${esc(r)}</option>`).join("");
   const ql=S.q.trim().toLowerCase();
@@ -177,26 +213,29 @@ function renderTasks(){
   cs.sort(so);
   $("tCnt").textContent=tasks.length?`показано ${cs.length} из ${tasks.length}`:"";
   $("tasks").innerHTML=cs.map(c=>{
-    const p=Math.round(c.p),g={};
+    const t=c.t,p=Math.round(c.p),g={},kd=!!P["dk:"+t.id],pl=P["dl:"+t.id],dlv=pl?pl.v:(t.dl||"");
     c.base.forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
     const list=(S.only?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
-    const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден"}[c.t.mode];
-    return `<div class="tc ${p===100?"full":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
-     <div class="top">${ring(p)}<div class="gr"><h3>${esc(c.t.name)}</h3>
+    const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден",manual:"добавлено вручную"}[t.mode]||"";
+    return `<div class="tc ${p===100?"full":""} ${kd?"tdel":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
+     <div class="top">${ring(p)}<div class="gr"><h3>${esc(t.name)}</h3>
       <div class="sub">Выполнено <b>${c.dn}</b> из <b>${c.tot}</b> · осталось <b>${c.left}</b></div>
-      <div class="sub2">${mode} · обновлено ${new Date(c.t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
-      ${admin?`<button class="dng" data-deltask="${c.t.id}" title="Удалить задачу">✕</button>`:""}</div>
+      ${admin||dlv?`<div class="sub">Срок: ${admin?`<input type="date" data-dl="${t.id}" value="${dlv}" style="padding:1px 6px;${pl?"border-color:var(--acc)":""}"> `:""}${dlTxt(dlv,c.left)}</div>`:""}
+      <div class="sub2">${mode} · обновлено ${new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
+      ${admin?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button><button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
      <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
      <div class="rs">${Object.entries(g).sort((a,b)=>b[1].n-a[1].n).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
        return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
-     <details data-id="${c.t.id}" ${opened.has(c.t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst">
-      ${list.map(x=>`<label class="it ${x.d?"d":""}"><input type="checkbox" ${x.d?"checked":""} ${admin?"":"disabled"} data-t="${c.t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}</label>`).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
+     <details data-id="${t.id}" ${opened.has(t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst" data-for="${t.id}">
+      ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`];
+        return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}${admin?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
     ||`<div class="empty" style="grid-column:1/-1">${tasks.length?"Ничего не найдено по фильтрам":"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»"}</div>`;
+  document.querySelectorAll(".lst").forEach(l=>{if(sc[l.dataset.for])l.scrollTop=sc[l.dataset.for]});
 }
 
 onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
 onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()});
-onAuthStateChanged(auth,u=>{admin=!!u;document.body.classList.toggle("admin",admin);$("loginBtn").style.display=admin?"none":"";$("who").textContent=u?u.email.replace(MAIL,""):"";render()});
+onAuthStateChanged(auth,u=>{admin=!!u;if(!u)P={};renderLinks();document.body.classList.toggle("admin",admin);$("loginBtn").style.display=admin?"none":"";$("who").textContent=u?u.email.replace(MAIL,""):"";render()});
 
 /* вход */
 $("loginBtn").onclick=()=>{$("lerr").textContent="";$("loginDlg").showModal()};
@@ -227,6 +266,7 @@ $("fo").onchange=e=>{S.only=e.target.checked;save();renderTasks()};
 $("fx").onclick=()=>{S={q:"",resp:"",sort:"file",only:false};save();$("q").value="";$("fs").value="file";$("fo").checked=false;renderTasks()};
 
 /* разбор Excel */
+const sid=n=>n.replace(/[\/\s.]+/g,"_");
 const DONE=/^(да|ок|ok|готов\w*|выполнен\w*|сделан\w*|\+|1|true)$/i;
 const toD=v=>{if(v instanceof Date)return isNaN(v)?null:new Date(v.getTime()+12*36e5);
   if(typeof v==="string"){const m=v.match(/(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})/);if(m)return new Date(+m[3],m[2]-1,+m[1],12)}return null};
@@ -245,7 +285,7 @@ $("xlsFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
       const H=(rows[h]||[]).map(v=>String(v??"").trim()),low=H.map(x=>x.toLowerCase());
       const fd=L=>{for(const re of L){const j=low.findIndex(x=>re.test(x));if(j>=0)return j}return -1};
       const hid=(meta[i]?.Hidden||0)>0,piv=/сводн/i.test(n);
-      return {n,hid,piv,H,ord:i,rows:rows.slice(h+1),use:!hid&&!piv&&rows.length>1,c:{
+      return {n,hid,piv,H,ord:i,rows:rows.slice(h+1),use:!hid&&!piv&&rows.length>1,dl:tasks.find(t=>t.id===sid(n))?.dl||"",c:{
         o:fd([/^магазин/,/объект/,/^оо$/,/^ма$/,/аптек|маг/]),
         r:fd([/^соит/,/^отв/,/системотехник|фио/,/на ком|исполнит/]),
         s:fd([/^статус/,/^(?!.*(дата|срок)).*(выполнен|готов|прошит|решен)/,/^проверка/]),
@@ -257,23 +297,96 @@ function showXls(){const L=$("xlsList"),st=L.scrollTop;
     const sel=(f,lab)=>`<label>${lab}<select data-x="${i}" data-f="${f}"><option value="-1">—</option>${s.H.map((h,j)=>`<option value="${j}" ${s.c[f]===j?"selected":""}>${esc(h||"(без названия)")}</option>`).join("")}</select></label>`;
     return `<div class="sh ${s.use?"":"off"}"><label class="shh"><input type="checkbox" data-xu="${i}" ${s.use?"checked":""}><b>${esc(s.n)}</b>${s.hid?'<span class="bd">скрыт</span>':""}${s.piv?'<span class="bd">сводная</span>':""}</label>
      <div class="pv">${b.items.length} объектов · выполнено ${dn} (${b.items.length?Math.round(dn/b.items.length*100):0}%) · ${{status:"по статусу",date:"по дате",none:"статус не найден"}[b.mode]}</div>
-     <div class="sel">${sel("o","Объект")}${sel("r","Ответственный")}${sel("s","Статус")}${sel("d","Дата")}</div></div>`}).join("");L.scrollTop=st}
-$("xlsList").onchange=e=>{const t=e.target;if(t.dataset.xu!==undefined)xs[t.dataset.xu].use=t.checked;if(t.dataset.f)xs[t.dataset.x].c[t.dataset.f]=+t.value;showXls()};
+     <div class="sel">${sel("o","Объект")}${sel("r","Ответственный")}${sel("s","Статус")}${sel("d","Дата")}<label>Общий срок<input type="date" data-xd="${i}" value="${s.dl||""}"></label></div></div>`}).join("");L.scrollTop=st}
+$("xlsList").onchange=e=>{const t=e.target;if(t.dataset.xd!==undefined)xs[t.dataset.xd].dl=t.value;if(t.dataset.xu!==undefined)xs[t.dataset.xu].use=t.checked;if(t.dataset.f)xs[t.dataset.x].c[t.dataset.f]=+t.value;showXls()};
 $("xlsCancel").onclick=()=>$("xlsDlg").close();
 $("xlsGo").onclick=async()=>{const use=xs.filter(s=>s.use);if(!use.length){alert("Выберите хотя бы один лист");return}
-  try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",s.n.replace(/[\/\s.]+/g,"_")),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,upd:Date.now()})}));$("xlsDlg").close()}
+  try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",sid(s.n)),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,dl:s.dl||"",upd:Date.now()})}));$("xlsDlg").close()}
   catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
+
+/* статус основных каналов (опрашивает ping_agent.py, сайт только показывает) */
+let links=[],meta=null;
+const p2=n=>String(n).padStart(2,"0");
+const fmt=ms=>{const d=new Date(ms);return `${p2(d.getDate())}.${p2(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`};
+const dur=ms=>{const m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} дн. ${h} ч`:h?`${h} ч ${m%60} мин`:`${m} мин`};
+function renderLinks(){
+  const down=links.filter(x=>x.up===false).sort((a,b)=>a.since-b.since),up=links.filter(x=>x.up===true).length,tot=links.length;
+  $("lkSec").style.display=tot||admin?"":"none";$("lkSec").classList.toggle("alert",down.length>0);
+  $("lkDate").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
+  const stale=meta&&Date.now()-meta.last>15*6e4;
+  $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
+  $("lkList").innerHTML=down.length?down.map(x=>`<div class="lk"><b>${esc(x.name)}</b> — основной канал не в сети<span>с ${fmt(x.since)} · ${dur(Date.now()-x.since)}</span></div>`).join(""):(tot&&up===tot?`<div class="lkok">✓ Все основные каналы в сети</div>`:"")}
+onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()});
+onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()});
+setInterval(renderLinks,6e4);
+const IPV4=/\b(?:\d{1,3}\.){3}\d{1,3}\b/;
+const parseLinks=txt=>txt.split(/\r?\n/).flatMap(l=>{const m=l.match(IPV4);if(!m)return[];const c=l.split(/\t|;/).map(x=>x.trim()).filter(Boolean);
+  const name=c.length>1?c.find(x=>!IPV4.test(x)&&!/^[\d\s.]+$/.test(x)):l.replace(m[0],"").trim();return name?[{name,ip:m[0]}]:[]});
+$("lkBtn").onclick=()=>{$("lkTxt").value="";$("lkCnt").textContent="";$("lkDlg").showModal()};
+$("lkCancel").onclick=()=>$("lkDlg").close();
+$("lkTxt").oninput=()=>{$("lkCnt").textContent="Найдено магазинов с IP: "+parseLinks($("lkTxt").value).length};
+$("lkFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await f.arrayBuffer();
+  if(/\.xlsx?$/i.test(f.name)){const wb=XLSX.read(b,{type:"array"});$("lkTxt").value=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:""}).map(r=>r.join("\t")).join("\n")}
+  else try{$("lkTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("lkTxt").value=new TextDecoder("windows-1251").decode(b)}
+  e.target.value="";$("lkTxt").oninput()};
+$("lkGo").onclick=async()=>{const it=parseLinks($("lkTxt").value);if(!it.length){alert("IP-адреса не найдены");return}
+  try{await Promise.all(it.flatMap(x=>{const id=sid(x.name);return[setDoc(doc(db,"link_cfg",id),{name:x.name,ip:x.ip}),setDoc(doc(db,"links",id),{name:x.name},{merge:true})]}));$("lkDlg").close();alert("Загружено магазинов: "+it.length)}
+  catch{alert("Ошибка записи. Войдите как админ и проверьте правила Firestore")}};
+
+/* ручное добавление */
+function openAdd(id){$("aTask").innerHTML=`<option value="">+ Новая задача</option>`+tasks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");
+  $("aTask").value=id||"";syncAdd();$("aName").value="";$("aRows").value="";$("aerr").textContent="";$("addDlg").showModal()}
+function syncAdd(){const id=$("aTask").value;$("aNameW").style.display=id?"none":"";$("aDl").value=id?(tasks.find(t=>t.id===id)?.dl||""):""}
+$("addBtn").onclick=()=>openAdd();$("aTask").onchange=syncAdd;$("aCancel").onclick=()=>$("addDlg").close();
+$("aGo").onclick=async()=>{const id=$("aTask").value,nm=$("aName").value.trim(),dl=$("aDl").value;
+  const items=$("aRows").value.split(/\r?\n/).map(l=>l.split(/\t|;/).map(x=>x.trim())).filter(c=>c[0]).map(c=>{const dv=toD(c[3]),it={o:c[0],r:(c[1]||"").split(/\s+/)[0]||"—",d:DONE.test(c[2]||"")?1:0};if(dv)it.t=dv.toLocaleDateString("ru-RU");return it});
+  if(!id&&!nm){$("aerr").textContent="Введите название задачи";return}
+  if(!items.length){$("aerr").textContent="Добавьте хотя бы один объект";return}
+  try{if(id){const tk=tasks.find(t=>t.id===id);await updateDoc(doc(db,"tasks",id),{items:[...tk.items,...items],upd:Date.now(),dl})}
+    else await setDoc(doc(db,"tasks","m_"+Date.now()),{name:nm,items,mode:"manual",ord:Math.max(-1,...tasks.map(t=>t.ord))+1,dl,upd:Date.now()});
+    $("addDlg").close()}catch{$("aerr").textContent="Ошибка записи. Проверьте вход админа"}};
+
+/* отложенные изменения: сначала отмечаем, потом «Применить» */
+const tog=(k,v)=>{if(P[k])delete P[k];else P[k]=v;render()};
+const tn=id=>tasks.find(t=>t.id===id);
+function describe(){const out=[];
+  for(const p of Object.values(P)){
+    if(["it","di","dl"].includes(p.k)&&P["dk:"+p.id])continue;
+    const t=tn(p.id),x=toAll.find(y=>y.id===p.id);
+    if(p.k==="to")out.push(`ТО · ${x?.name}: ${p.v?"будет отмечено выполненным":"будет снята отметка «выполнено»"}`);
+    if(p.k==="dt")out.push(`ТО · УДАЛИТЬ магазин «${x?.name}» из списка`);
+    if(p.k==="dk")out.push(`УДАЛИТЬ задачу «${t?.name}» целиком (${t?.items.length} объектов)`);
+    if(p.k==="it")out.push(`«${t?.name}» · ${t?.items[p.i].o}: ${p.v?"будет отмечено выполненным":"будет снята отметка «выполнено»"}`);
+    if(p.k==="di")out.push(`«${t?.name}» · УДАЛИТЬ объект ${t?.items[p.i].o}`);
+    if(p.k==="dl")out.push(`«${t?.name}» · срок: ${t?.dl||"не задан"} → ${p.v||"убрать срок"}`)}
+  return out}
+$("pundo").onclick=()=>{P={};render()};
+$("papply").onclick=()=>{$("cfmList").innerHTML=describe().map(l=>`<li>${esc(l)}</li>`).join("");$("cfmDlg").showModal()};
+$("cfmNo").onclick=()=>$("cfmDlg").close();
+$("cfmYes").onclick=async()=>{const jobs=[],by={};
+  for(const p of Object.values(P)){
+    if(p.k==="to")jobs.push(updateDoc(doc(db,"to_stores",p.id),{done:p.v}));
+    else if(p.k==="dt")jobs.push(deleteDoc(doc(db,"to_stores",p.id)));
+    else if(p.k==="dk")jobs.push(deleteDoc(doc(db,"tasks",p.id)));
+    else(by[p.id]??=[]).push(p)}
+  for(const id in by){if(P["dk:"+id]||!tn(id))continue;const items=tn(id).items.map(x=>({...x})),del=new Set(),u={upd:Date.now()};
+    for(const p of by[id]){if(p.k==="it")items[p.i].d=p.v;else if(p.k==="di")del.add(p.i);else if(p.k==="dl")u.dl=p.v}
+    u.items=items.filter((_,i)=>!del.has(i));jobs.push(updateDoc(doc(db,"tasks",id),u))}
+  try{await Promise.all(jobs);P={};$("cfmDlg").close();render()}catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
+addEventListener("beforeunload",e=>{if(Object.keys(P).length){e.preventDefault();e.returnValue=""}});
 
 /* клики */
 document.addEventListener("toggle",e=>{const id=e.target.dataset?.id;if(id)e.target.open?opened.add(id):opened.delete(id)},true);
-document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const g=a=>t.dataset[a];
+document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const g=a=>t.dataset[a];
   if(g("resp")!==undefined){S.resp=S.resp===g("resp")?"":g("resp");save();renderTasks()}
-  if(g("deltask")&&confirm("Удалить задачу с сайта?"))await deleteDoc(doc(db,"tasks",g("deltask")));
-  if(g("delto")&&confirm("Убрать магазин из списка ТО?"))await deleteDoc(doc(db,"to_stores",g("delto")))});
-document.addEventListener("change",async e=>{const t=e.target;if(!admin)return;
-  if(t.dataset.to)await updateDoc(doc(db,"to_stores",t.dataset.to),{done:t.checked});
-  if(t.dataset.t){const tk=tasks.find(x=>x.id===t.dataset.t),items=tk.items.map(x=>({...x}));items[+t.dataset.i].d=t.checked?1:0;
-    await updateDoc(doc(db,"tasks",tk.id),{items,upd:Date.now()})}});
+  if(g("addto"))openAdd(g("addto"));
+  if(g("deltask"))tog("dk:"+g("deltask"),{k:"dk",id:g("deltask")});
+  if(g("delto"))tog("dt:"+g("delto"),{k:"dt",id:g("delto")});
+  if(g("delit")){const v=g("delit"),c=v.lastIndexOf(":");tog("di:"+v,{k:"di",id:v.slice(0,c),i:+v.slice(c+1)})}});
+document.addEventListener("change",e=>{const t=e.target;if(!admin)return;
+  if(t.dataset.to){const x=toAll.find(y=>y.id===t.dataset.to),k="to:"+x.id;if(t.checked===!!x.done)delete P[k];else P[k]={k:"to",id:x.id,v:t.checked};render()}
+  if(t.dataset.t){const tk=tn(t.dataset.t),i=+t.dataset.i,k=`it:${tk.id}:${i}`,v=t.checked?1:0;if(v===tk.items[i].d)delete P[k];else P[k]={k:"it",id:tk.id,i,v};render()}
+  if(t.dataset.dl){const tk=tn(t.dataset.dl),k="dl:"+tk.id;if(t.value===(tk.dl||""))delete P[k];else P[k]={k:"dl",id:tk.id,v:t.value};render()}});
 </script>
 </body>
 </html>
