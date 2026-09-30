@@ -3,242 +3,277 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>КРД · Открытия и ТО</title>
+<title>КРД · Задачи и ТО</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#0d1117;--p:#161b22;--p2:#1c232c;--ink:#e6edf3;--mute:#8b98a5;--line:#2a323c;--acc:#f0a30a;--ok:#3fb950;--bad:#f85149;--okbg:#12261a;--badbg:#2d1517}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,system-ui,sans-serif}
-header{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line)}
 .logo{font-weight:800;font-size:19px;letter-spacing:.5px}.logo b{color:var(--acc)}
 .sp{flex:1}
-button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--p2);color:var(--ink);border-radius:6px;padding:7px 13px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--p2);color:var(--ink);border-radius:6px;padding:7px 12px}
 button:hover{border-color:var(--acc)}
-button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
 .pri{background:var(--acc);border-color:var(--acc);color:#1a1200;font-weight:700}
 .dng{color:var(--bad)}
 .who{color:var(--mute);font-size:13px}
-.month{display:flex;align-items:center;gap:6px}
-.month span{min-width:150px;text-align:center;font-size:17px;font-weight:700;text-transform:capitalize}
-.wrap{max-width:1500px;margin:0 auto;padding:20px 24px}
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.wrap{max-width:1700px;margin:0 auto;padding:16px 20px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 @media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
-.k{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px}
+.k{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px}
+.k h4{margin:0;font-size:13px;color:var(--mute);font-weight:600}.k p{margin:2px 0 0;font-size:15px;font-weight:600}
+.big{font-size:36px;font-weight:800;line-height:1;width:74px;text-align:center;flex:none}
 .ring{--v:0;--c:var(--ok);width:74px;height:74px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),var(--line) 0)}
 .ring i{width:56px;height:56px;border-radius:50%;background:var(--p);display:grid;place-items:center;font:700 17px/1 "Segoe UI",sans-serif;font-style:normal}
-.big{font-size:38px;font-weight:800;line-height:1;width:74px;text-align:center;flex:none}
-.k h4{margin:0;font-size:13px;color:var(--mute);font-weight:600}
-.k p{margin:3px 0 0;font-size:15px;font-weight:600}
-.cols{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start}
+.cols{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
 @media(max-width:900px){.cols{grid-template-columns:1fr}}
-.side{display:grid;gap:18px}
-section{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:16px}
-.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-h2{margin:0;font-size:15px;font-weight:700}
-.cnt{color:var(--mute);font-size:13px}
+section{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:14px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+h2{margin:0;font-size:15px}.cnt{color:var(--mute);font-size:13px;font-weight:400}
 .bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--ok);border-radius:4px;transition:width .3s}
-.to{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-top:6px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad)}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.month{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.month span{font-weight:700;text-transform:capitalize}
+.to{display:flex;align-items:center;gap:9px;padding:7px 9px;margin-top:5px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad)}
 .to.done{background:var(--okbg);border-left-color:var(--ok)}
 .to .n{flex:1}.to.done .n{color:var(--mute);text-decoration:line-through}
-.to em{font-style:normal;font-size:12px;font-weight:700;color:var(--bad)}.to.done em{color:var(--ok)}
-input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);flex:none}
-input[disabled]{opacity:1}
-.add{display:none;gap:8px;margin-top:12px}body.admin .add{display:flex}
-input[type=text],input[type=date],input[type=password]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-.st{display:grid;grid-template-columns:1fr 46px;gap:2px 10px;margin-top:9px;font-size:13px}
-.st .bar{grid-column:1/-1;height:5px}.st b{text-align:right}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
-.card{background:var(--p2);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:14px}
-.card.over{border-top-color:var(--bad)}.card.full{border-top-color:var(--ok)}
-.top{display:flex;gap:12px;align-items:flex-start}
-.top .ring{width:58px;height:58px}.top .ring i{width:44px;height:44px;font-size:13px;background:var(--p2)}
-.top h3{margin:0;font-size:16px}
-.date{font-weight:700;color:var(--acc)}.over .date{color:var(--bad)}
-.meta{margin:10px 0;color:var(--mute);font-size:13px;display:grid;gap:2px}.meta b{color:var(--ink);font-weight:600}
-details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
-summary{cursor:pointer;color:var(--mute);font-size:13px}
-.tasks{display:grid;margin-top:6px}
-.tasks label{display:flex;gap:9px;align-items:center;padding:4px 4px;border-radius:5px}
-.tasks label:hover{background:var(--p)}.tasks .d{color:var(--mute);text-decoration:line-through}
-.acts{display:flex;gap:8px;margin-top:10px}
-textarea{font:inherit;width:100%;min-height:170px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical;margin-top:8px}
-.hint{color:var(--mute);font-size:13px;margin:6px 0 0}
-.empty{color:var(--mute);padding:18px 0;text-align:center}
+.to em{font-style:normal;font-size:11px;font-weight:700;color:var(--bad)}.to.done em{color:var(--ok)}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);flex:none}input[disabled]{opacity:1}
+.add{display:none;gap:8px;margin-top:10px}body.admin .add{display:flex}
 .adm{display:none}body.admin .adm{display:inline-block}
-dialog{border:1px solid var(--line);border-radius:10px;background:var(--p);color:var(--ink);padding:20px;width:min(440px,92vw)}
-dialog::backdrop{background:#000a}
-dialog h2{font-size:17px}
-dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}dialog label.f input{margin-top:3px}
-.row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-.err{color:var(--bad);min-height:18px;margin-top:8px;font-size:13px}
+input[type=text],input[type=password],select,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+input[type=text],input[type=password],textarea{width:100%}
+textarea{min-height:160px;margin-top:8px}
+.fb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.fb input[type=text]{flex:1;min-width:220px;width:auto}
+.chk{display:flex;gap:6px;align-items:center;color:var(--mute);white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
+.tc{background:var(--p2);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:14px}
+.tc.full{border-top-color:var(--ok)}
+.top{display:flex;gap:12px;align-items:center;margin-bottom:10px}.top .gr{flex:1}
+.top .ring{width:64px;height:64px}.top .ring i{width:48px;height:48px;font-size:14px;background:var(--p2)}
+.top h3{margin:0;font-size:16px}.sub{color:var(--mute);font-size:13px}.sub b{color:var(--ink)}.sub2{color:var(--mute);font-size:12px}
+.rs{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:10px}
+.rr{display:grid;grid-template-columns:1fr auto 38px;gap:0 6px;align-items:center;text-align:left;padding:4px 6px;border-radius:6px;font-size:13px;background:transparent}
+.rr.on{border-color:var(--acc);background:var(--p)}
+.rr .mb{grid-column:1/-1;height:4px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:2px}.rr .mb i{display:block;height:100%;background:var(--acc)}
+.rr em{font-style:normal;text-align:right;color:var(--mute)}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}summary{cursor:pointer;color:var(--mute);font-size:13px}
+.lst{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;margin-top:6px;max-height:420px;overflow:auto}
+@media(max-width:700px){.lst,.rs{grid-template-columns:1fr}}
+.it{display:flex;gap:8px;align-items:center;padding:3px 4px;border-radius:5px;font-size:13px}
+.it:hover{background:var(--p)}.it.d .o{color:var(--mute);text-decoration:line-through}
+.it .o{flex:1}.it .r,.it .dt{color:var(--mute);font-size:12px}
+.empty{color:var(--mute);padding:18px 0;text-align:center}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--p);color:var(--ink);padding:20px;width:min(460px,92vw)}
+dialog.wide{width:min(820px,94vw)}dialog::backdrop{background:#000a}
+dialog h2{font-size:17px}.hint{color:var(--mute);font-size:13px;margin:6px 0}
+dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.err{color:var(--bad);min-height:18px;font-size:13px;margin-top:8px}
+#xlsList{max-height:60vh;overflow:auto;display:grid;gap:8px;margin-top:10px}
+.sh{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--p2)}.sh.off{opacity:.55}
+.shh{display:flex;gap:8px;align-items:center}.bd{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--line);color:var(--mute)}
+.pv{font-size:13px;color:var(--mute);margin:4px 0 6px 25px}
+.sel{display:flex;flex-wrap:wrap;gap:8px;margin-left:25px}.sel label{font-size:12px;color:var(--mute);display:grid;gap:2px}.sel select{max-width:170px}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">КРД<b>.</b>ОТКРЫТИЯ</div>
+  <div class="logo">КРД<b>.</b>ЗАДАЧИ</div>
   <button id="loginBtn" class="pri">Вход для админа</button>
-  <span class="who" id="who"></span>
-  <button id="logoutBtn" class="adm">Выйти</button>
+  <span class="who" id="who"></span><button id="logoutBtn" class="adm">Выйти</button>
   <div class="sp"></div>
-  <div class="month"><button id="prev" aria-label="Предыдущий месяц">‹</button><span id="mlabel"></span><button id="next" aria-label="Следующий месяц">›</button></div>
 </header>
 <div class="wrap">
   <div class="kpi" id="kpi"></div>
   <div class="cols">
-    <div class="side">
-      <section>
-        <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт списком</button></div>
-        <div class="bar"><i id="toBar"></i></div>
-        <div id="toList"></div>
-        <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">Добавить</button></div>
-      </section>
-      <section>
-        <div class="hd"><h2>Этапы по всем открытиям</h2></div>
-        <div id="stages"></div>
-      </section>
-    </div>
     <section>
-      <div class="hd"><h2>Открытия магазинов</h2><div style="display:flex;gap:8px"><button class="adm" id="opImp">Импорт списком</button><button class="pri adm" id="opNew">+ Новое открытие</button></div></div>
-      <div class="grid" id="opList"></div>
+      <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт</button></div>
+      <div class="month"><button id="prev" aria-label="Предыдущий месяц">‹</button><span id="mlabel"></span><button id="next" aria-label="Следующий месяц">›</button></div>
+      <div class="bar"><i id="toBar"></i></div>
+      <div id="toList"></div>
+      <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">+</button></div>
+    </section>
+    <section>
+      <div class="hd"><h2>Задачи <span class="cnt" id="tCnt"></span></h2><button class="pri adm" id="xlsBtn">Загрузить Excel</button><input type="file" id="xlsFile" accept=".xlsx,.xlsm,.xls" hidden></div>
+      <div class="fb">
+        <input type="text" id="q" placeholder="Поиск по магазину или системотехнику">
+        <select id="fr" aria-label="Системотехник"></select>
+        <select id="fs" aria-label="Сортировка">
+          <option value="file">Как в файле</option><option value="pd">% выполнения ↓</option><option value="pa">% выполнения ↑</option>
+          <option value="dd">Выполнено (шт) ↓</option><option value="ld">Осталось (шт) ↓</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="fo">только невыполненные</label>
+        <button id="fx">Сбросить</button>
+      </div>
+      <div class="grid" id="tasks"></div>
     </section>
   </div>
 </div>
 
-<dialog id="loginDlg">
-  <h2>Вход для админа</h2>
+<dialog id="loginDlg"><h2>Вход для админа</h2>
   <label class="f">Логин<input type="text" id="lu" autocomplete="username"></label>
   <label class="f">Пароль<input type="password" id="lp" autocomplete="current-password"></label>
   <div class="err" id="lerr"></div>
-  <div class="row"><button id="lcancel">Отмена</button><button class="pri" id="lgo">Войти</button></div>
-</dialog>
-<dialog id="opDlg">
-  <h2 id="opTitle">Открытие магазина</h2>
-  <label class="f">Название магазина<input type="text" id="f_name"></label>
-  <label class="f">Дата открытия<input type="date" id="f_date"></label>
-  <label class="f">Адрес<input type="text" id="f_addr"></label>
-  <label class="f">Ответственный<input type="text" id="f_resp"></label>
-  <label class="f">Кто собирает по факту (отпуск, больничный)<input type="text" id="f_fact"></label>
-  <div class="row"><button id="ocancel">Отмена</button><button class="pri" id="osave">Сохранить</button></div>
-</dialog>
+  <div class="row"><button id="lcancel">Отмена</button><button class="pri" id="lgo">Войти</button></div></dialog>
 
-<dialog id="impDlg">
-  <h2 id="impTitle">Импорт списком</h2>
-  <p class="hint" id="impHint"></p>
-  <textarea id="impTxt" placeholder="Вставьте сюда список"></textarea>
-  <div class="row" style="justify-content:space-between;align-items:center">
-    <label class="hint" style="margin:0">Или файл .txt: <input type="file" id="impFile" accept=".txt,.csv,text/plain"></label>
-  </div>
-  <div class="row"><button id="impCancel">Отмена</button><button class="pri" id="impGo">Добавить</button></div>
-</dialog>
+<dialog id="impDlg"><h2>Импорт магазинов для ТО</h2>
+  <p class="hint">По одному магазину в строке (столбец из Excel или файл .txt). Добавятся в выбранный месяц, повторы пропускаются.</p>
+  <textarea id="impTxt" placeholder="Вставьте список"></textarea>
+  <label class="hint">Или файл: <input type="file" id="impFile" accept=".txt,.csv,text/plain"></label>
+  <div class="row"><button id="impCancel">Отмена</button><button class="pri" id="impGo">Добавить</button></div></dialog>
+
+<dialog id="xlsDlg" class="wide"><h2>Какие листы использовать?</h2>
+  <p class="hint">Скрытые листы и сводные сняты по умолчанию. Столбцы определены автоматически, при ошибке поправьте вручную. Статус берётся из столбца «Статус»; если его нет, объект считается выполненным, когда дата уже наступила. Загрузка заменяет данные этих листов на сайте.</p>
+  <div id="xlsList"></div>
+  <div class="row"><button id="xlsCancel">Отмена</button><button class="pri" id="xlsGo">Загрузить выбранные</button></div></dialog>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,collection,onSnapshot,addDoc,updateDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,onSnapshot,addDoc,setDoc,updateDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",authDomain:"krd-tracker.firebaseapp.com",projectId:"krd-tracker",storageBucket:"krd-tracker.firebasestorage.app",messagingSenderId:"506382681336",appId:"1:506382681336:web:e093bf1daba1656685270d"});
 const db=getFirestore(app),auth=getAuth(app),MAIL="@krd.ru";
-const TASKS=[["maket","Подготовка макета"],["pkd","Заливка и настройка ПКД"],["server","Заливка и настройка сервера"],["rmaster","Роутер мастер"],["rreserve","Роутер резерв"],["recon","Сверка сервера"],["kkm","Регистрация ККМ"],["tbo","Регистрация ТБО"],["egais","Ключ ЕГАИС"],["uks","Сборка УКС на магазине"],["kassy","Сборка касс"],["kso","Сборка КСО"],["ap","Установка точек доступа"]];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+const col=p=>p>=80?"var(--ok)":p>=40?"var(--acc)":"var(--bad)";
+const ring=p=>`<div class="ring" style="--v:${p};--c:${col(p)}"><i>${p}%</i></div>`;
 let cur=new Date();cur.setDate(1);
-let admin=false,toAll=[],opAll=[],editId=null;const opened=new Set();
-const ring=(p,c)=>`<div class="ring" style="--v:${p};--c:${c||"var(--ok)"}"><i>${p}%</i></div>`;
-const done=x=>TASKS.filter(([k])=>(x.tasks||{})[k]).length;
+let admin=false,toAll=[],tasks=[],xs=[];const opened=new Set();
+
+/* Фильтры хранятся ТОЛЬКО в этом браузере, у других посетителей они не меняются */
+let S={q:"",resp:"",sort:"file",only:false};
+try{Object.assign(S,JSON.parse(localStorage.getItem("krd_view")||"{}"))}catch{}
+const save=()=>{try{localStorage.setItem("krd_view",JSON.stringify(S))}catch{}};
 
 function render(){
-  const k=key(cur),today=new Date().toISOString().slice(0,10);
+  const k=key(cur);
   $("mlabel").textContent=cur.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
   const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
-  const op=opAll.filter(x=>(x.date||"").startsWith(k)).sort((a,b)=>a.date.localeCompare(b.date));
   const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
-  const ps=op.map(x=>Math.round(done(x)/TASKS.length*100));
-  const avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):0;
-  const ready=ps.filter(p=>p===100).length,over=op.filter((x,i)=>x.date<today&&ps[i]<100).length;
+  $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
+  $("toList").innerHTML=to.map(x=>`<div class="to ${x.done?"done":""}"><input type="checkbox" ${x.done?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено"><span class="n">${esc(x.name)}</span><em>${x.done?"выполнено":"не выполнено"}</em>${admin?`<button class="dng" data-delto="${x.id}" title="Убрать">✕</button>`:""}</div>`).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
 
-  $("kpi").innerHTML=`
-   <div class="k">${ring(toP)}<div><h4>ТО выполнено</h4><p>${dn} из ${to.length}</p></div></div>
-   <div class="k">${ring(avg,"var(--acc)")}<div><h4>Готовность открытий</h4><p>в среднем по месяцу</p></div></div>
-   <div class="k"><div class="big">${op.length}</div><div><h4>Открытий в месяце</h4><p>полностью готово: ${ready}</p></div></div>
-   <div class="k"><div class="big" style="color:${over?"var(--bad)":"var(--ok)"}">${over}</div><div><h4>Просрочено</h4><p>дата прошла, этапы не закрыты</p></div></div>`;
+  const all=tasks.flatMap(t=>t.items),ad=all.filter(x=>x.d).length,ap=all.length?Math.round(ad/all.length*100):0;
+  $("kpi").innerHTML=`<div class="k">${ring(toP)}<div><h4>ТО выполнено</h4><p>${dn} из ${to.length}</p></div></div>
+   <div class="k">${ring(ap)}<div><h4>Задачи в целом</h4><p>${ad} из ${all.length} объектов</p></div></div>
+   <div class="k"><div class="big">${tasks.length}</div><div><h4>Задач в работе</h4><p>завершено: ${tasks.filter(t=>t.items.length&&t.items.every(x=>x.d)).length}</p></div></div>
+   <div class="k"><div class="big" style="color:${all.length-ad?"var(--acc)":"var(--ok)"}">${all.length-ad}</div><div><h4>Осталось объектов</h4><p>по всем задачам</p></div></div>`;
+  renderTasks();
+}
 
-  $("toCnt").textContent=to.length?`${toP}%`:"";
-  $("toBar").style.width=toP+"%";
-  $("toList").innerHTML=to.map(x=>`<div class="to ${x.done?"done":""}">
-   <input type="checkbox" ${x.done?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено">
-   <span class="n">${esc(x.name)}</span><em>${x.done?"выполнено":"не выполнено"}</em>
-   ${admin?`<button class="dng" data-delto="${x.id}" title="Убрать">✕</button>`:""}</div>`).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
-
-  $("stages").innerHTML=op.length?`<div class="st">`+TASKS.map(([kk,l])=>{
-    const n=op.filter(x=>(x.tasks||{})[kk]).length,p=Math.round(n/op.length*100);
-    return `<span>${l}</span><b>${n}/${op.length}</b><div class="bar"><i style="width:${p}%;${p<100?"background:var(--acc)":""}"></i></div>`}).join("")+`</div>`
-    :`<div class="empty">Нет открытий в этом месяце</div>`;
-
-  $("opList").innerHTML=op.map((x,i)=>{
-    const t=x.tasks||{},p=ps[i],cls=p===100?"full":(x.date<today?"over":"");
-    return `<div class="card ${cls}">
-     <div class="top">${ring(p,p===100?"var(--ok)":x.date<today?"var(--bad)":"var(--acc)")}
-      <div><h3>${esc(x.name)}</h3><div class="date">${new Date(x.date).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div></div></div>
-     <div class="meta"><div>${esc(x.addr)}</div><div>Ответственный: <b>${esc(x.resp)||"—"}</b></div>${x.fact?`<div>Собирает по факту: <b>${esc(x.fact)}</b></div>`:""}</div>
-     <div class="bar"><i style="width:${p}%"></i></div>
-     <details data-id="${x.id}" ${opened.has(x.id)?"open":""}><summary>Этапы: ${done(x)} из ${TASKS.length}</summary>
-      <div class="tasks">${TASKS.map(([kk,l])=>`<label class="${t[kk]?"d":""}"><input type="checkbox" ${t[kk]?"checked":""} ${admin?"":"disabled"} data-op="${x.id}" data-k="${kk}">${l}</label>`).join("")}</div></details>
-     ${admin?`<div class="acts"><button data-edit="${x.id}">Изменить</button><button class="dng" data-delop="${x.id}">Удалить</button></div>`:""}</div>`}).join("")||`<div class="empty">Открытий на этот месяц нет</div>`;
+function renderTasks(){
+  const rs=[...new Set(tasks.flatMap(t=>t.items.map(x=>x.r)))].sort((a,b)=>a.localeCompare(b,"ru"));
+  $("fr").innerHTML=`<option value="">Все системотехники</option>`+rs.map(r=>`<option ${r===S.resp?"selected":""}>${esc(r)}</option>`).join("");
+  const ql=S.q.trim().toLowerCase();
+  let cs=tasks.map(t=>{
+    const base=t.items.map((x,i)=>({...x,i})).filter(x=>(!S.resp||x.r===S.resp)&&(!ql||(x.o+" "+x.r).toLowerCase().includes(ql)));
+    const dn=base.filter(x=>x.d).length;
+    return {t,base,dn,tot:base.length,left:base.length-dn,p:base.length?dn/base.length*100:0};
+  }).filter(c=>c.tot&&(!S.only||c.left));
+  const so={pd:(a,b)=>b.p-a.p,pa:(a,b)=>a.p-b.p,dd:(a,b)=>b.dn-a.dn,ld:(a,b)=>b.left-a.left,file:(a,b)=>a.t.ord-b.t.ord}[S.sort]||(()=>0);
+  cs.sort(so);
+  $("tCnt").textContent=tasks.length?`показано ${cs.length} из ${tasks.length}`:"";
+  $("tasks").innerHTML=cs.map(c=>{
+    const p=Math.round(c.p),g={};
+    c.base.forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
+    const list=(S.only?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
+    const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден"}[c.t.mode];
+    return `<div class="tc ${p===100?"full":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
+     <div class="top">${ring(p)}<div class="gr"><h3>${esc(c.t.name)}</h3>
+      <div class="sub">Выполнено <b>${c.dn}</b> из <b>${c.tot}</b> · осталось <b>${c.left}</b></div>
+      <div class="sub2">${mode} · обновлено ${new Date(c.t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
+      ${admin?`<button class="dng" data-deltask="${c.t.id}" title="Удалить задачу">✕</button>`:""}</div>
+     <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
+     <div class="rs">${Object.entries(g).sort((a,b)=>b[1].n-a[1].n).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
+       return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
+     <details data-id="${c.t.id}" ${opened.has(c.t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst">
+      ${list.map(x=>`<label class="it ${x.d?"d":""}"><input type="checkbox" ${x.d?"checked":""} ${admin?"":"disabled"} data-t="${c.t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}</label>`).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
+    ||`<div class="empty" style="grid-column:1/-1">${tasks.length?"Ничего не найдено по фильтрам":"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»"}</div>`;
 }
 
 onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
-onSnapshot(collection(db,"openings"),s=>{opAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
+onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()});
 onAuthStateChanged(auth,u=>{admin=!!u;document.body.classList.toggle("admin",admin);$("loginBtn").style.display=admin?"none":"";$("who").textContent=u?u.email.replace(MAIL,""):"";render()});
 
-$("prev").onclick=()=>{cur.setMonth(cur.getMonth()-1);render()};
-$("next").onclick=()=>{cur.setMonth(cur.getMonth()+1);render()};
+/* вход */
 $("loginBtn").onclick=()=>{$("lerr").textContent="";$("loginDlg").showModal()};
 $("lcancel").onclick=()=>$("loginDlg").close();
-$("lgo").onclick=async()=>{try{await signInWithEmailAndPassword(auth,$("lu").value.trim().toLowerCase()+MAIL,$("lp").value);$("lp").value="";$("loginDlg").close()}catch(e){$("lerr").textContent="Неверный логин или пароль"}};
+$("lgo").onclick=async()=>{try{await signInWithEmailAndPassword(auth,$("lu").value.trim().toLowerCase()+MAIL,$("lp").value);$("lp").value="";$("loginDlg").close()}catch{$("lerr").textContent="Неверный логин или пароль"}};
 $("lp").onkeydown=e=>{if(e.key==="Enter")$("lgo").click()};
 $("logoutBtn").onclick=()=>signOut(auth);
+
+/* ТО */
+$("prev").onclick=()=>{cur.setMonth(cur.getMonth()-1);render()};
+$("next").onclick=()=>{cur.setMonth(cur.getMonth()+1);render()};
 $("toAdd").onclick=async()=>{const n=$("toName").value.trim();if(!n)return;await addDoc(collection(db,"to_stores"),{name:n,month:key(cur),done:false});$("toName").value=""};
 $("toName").onkeydown=e=>{if(e.key==="Enter")$("toAdd").click()};
-
-function openOp(x){editId=x?x.id:null;$("opTitle").textContent=x?"Изменить открытие":"Новое открытие";
-  $("f_name").value=x?.name||"";$("f_date").value=x?.date||key(cur)+"-01";$("f_addr").value=x?.addr||"";$("f_resp").value=x?.resp||"";$("f_fact").value=x?.fact||"";$("opDlg").showModal()}
-$("opNew").onclick=()=>openOp();
-$("ocancel").onclick=()=>$("opDlg").close();
-$("osave").onclick=async()=>{const d={name:$("f_name").value.trim(),date:$("f_date").value,addr:$("f_addr").value.trim(),resp:$("f_resp").value.trim(),fact:$("f_fact").value.trim()};
-  if(!d.name||!d.date){alert("Укажите название и дату");return}
-  if(editId)await updateDoc(doc(db,"openings",editId),d);else await addDoc(collection(db,"openings"),{...d,tasks:{}});$("opDlg").close()};
-
-let impMode="to";
-function openImp(m){impMode=m;
-  $("impTitle").textContent=m==="to"?"Импорт магазинов для ТО":"Импорт открытий";
-  $("impHint").textContent=m==="to"
-   ?"По одному магазину в строке (можно скопировать столбец из Excel). Добавятся в выбранный месяц, повторы пропускаются."
-   :"Одна строка — одно открытие. Столбцы из Excel по порядку: название, дата (25.10.2026), адрес, ответственный. Если даты нет, ставится 1 число выбранного месяца.";
-  $("impTxt").value="";$("impDlg").showModal()}
-$("toImp").onclick=()=>openImp("to");
-$("opImp").onclick=()=>openImp("op");
+$("toImp").onclick=()=>{$("impTxt").value="";$("impDlg").showModal()};
 $("impCancel").onclick=()=>$("impDlg").close();
 $("impFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await f.arrayBuffer();
   try{$("impTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("impTxt").value=new TextDecoder("windows-1251").decode(b)}e.target.value=""};
-const pd=v=>{v=(v||"").trim();let m=v.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})$/);
-  if(m)return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:""};
-$("impGo").onclick=async()=>{
-  const lines=$("impTxt").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!lines.length)return;
-  const k=key(cur);let jobs=[];
-  if(impMode==="to"){const ex=new Set(toAll.filter(x=>x.month===k).map(x=>x.name.toLowerCase()));
-    for(const n of lines){if(ex.has(n.toLowerCase()))continue;ex.add(n.toLowerCase());jobs.push(addDoc(collection(db,"to_stores"),{name:n,month:k,done:false}))}}
-  else for(const l of lines){const c=l.split(/\t|;/).map(x=>x.trim());if(!c[0])continue;
-    jobs.push(addDoc(collection(db,"openings"),{name:c[0],date:pd(c[1])||k+"-01",addr:c[2]||"",resp:c[3]||"",fact:"",tasks:{}}))}
-  try{await Promise.all(jobs);$("impDlg").close();alert("Добавлено: "+jobs.length)}catch(e){alert("Ошибка записи. Проверьте, что вы вошли как админ")}};
+$("impGo").onclick=async()=>{const k=key(cur),ex=new Set(toAll.filter(x=>x.month===k).map(x=>x.name.toLowerCase())),jobs=[];
+  for(const n of $("impTxt").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)){if(ex.has(n.toLowerCase()))continue;ex.add(n.toLowerCase());jobs.push(addDoc(collection(db,"to_stores"),{name:n,month:k,done:false}))}
+  try{await Promise.all(jobs);$("impDlg").close();alert("Добавлено: "+jobs.length)}catch{alert("Ошибка записи. Войдите как админ")}};
 
+/* локальные фильтры */
+$("q").value=S.q;$("fs").value=S.sort;$("fo").checked=S.only;
+$("q").oninput=e=>{S.q=e.target.value;save();renderTasks()};
+$("fr").onchange=e=>{S.resp=e.target.value;save();renderTasks()};
+$("fs").onchange=e=>{S.sort=e.target.value;save();renderTasks()};
+$("fo").onchange=e=>{S.only=e.target.checked;save();renderTasks()};
+$("fx").onclick=()=>{S={q:"",resp:"",sort:"file",only:false};save();$("q").value="";$("fs").value="file";$("fo").checked=false;renderTasks()};
+
+/* разбор Excel */
+const DONE=/^(да|ок|ok|готов\w*|выполнен\w*|сделан\w*|\+|1|true)$/i;
+const toD=v=>{if(v instanceof Date)return isNaN(v)?null:new Date(v.getTime()+12*36e5);
+  if(typeof v==="string"){const m=v.match(/(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})/);if(m)return new Date(+m[3],m[2]-1,+m[1],12)}return null};
+function build(s){const {o,r,s:st,d}=s.c,end=new Date();end.setHours(23,59,59);const items=[];
+  for(const row of s.rows){const ob=o>=0?String(row[o]??"").trim():"";if(!ob)continue;
+    const rs=r>=0?String(row[r]??"").trim().split(/\s+/)[0]:"",dv=d>=0?toD(row[d]):null;
+    let dn=0;if(st>=0)dn=DONE.test(String(row[st]??"").trim())?1:0;else if(dv)dn=dv<=end?1:0;
+    const it={o:ob,r:rs||"—",d:dn};if(dv)it.t=dv.toLocaleDateString("ru-RU");items.push(it)}
+  return {items,mode:st>=0?"status":d>=0?"date":"none"}}
+$("xlsBtn").onclick=()=>$("xlsFile").click();
+$("xlsFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{const wb=XLSX.read(await f.arrayBuffer(),{type:"array",cellDates:true}),meta=wb.Workbook?.Sheets||[];
+    xs=wb.SheetNames.map((n,i)=>{
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:null,blankrows:false});
+      let h=rows.findIndex((r,ix)=>ix<10&&r.filter(v=>v!=null&&v!=="").length>=2);if(h<0)h=0;
+      const H=(rows[h]||[]).map(v=>String(v??"").trim()),low=H.map(x=>x.toLowerCase());
+      const fd=L=>{for(const re of L){const j=low.findIndex(x=>re.test(x));if(j>=0)return j}return -1};
+      const hid=(meta[i]?.Hidden||0)>0,piv=/сводн/i.test(n);
+      return {n,hid,piv,H,ord:i,rows:rows.slice(h+1),use:!hid&&!piv&&rows.length>1,c:{
+        o:fd([/^магазин/,/объект/,/^оо$/,/^ма$/,/аптек|маг/]),
+        r:fd([/^соит/,/^отв/,/системотехник|фио/,/на ком|исполнит/]),
+        s:fd([/^статус/,/^(?!.*(дата|срок)).*(выполнен|готов|прошит|решен)/,/^проверка/]),
+        d:fd([/дата|срок/])}}});
+    showXls();$("xlsDlg").showModal()}catch(err){alert("Не удалось прочитать файл: "+err.message)}
+  e.target.value=""};
+function showXls(){const L=$("xlsList"),st=L.scrollTop;
+  L.innerHTML=xs.map((s,i)=>{const b=build(s),dn=b.items.filter(x=>x.d).length;
+    const sel=(f,lab)=>`<label>${lab}<select data-x="${i}" data-f="${f}"><option value="-1">—</option>${s.H.map((h,j)=>`<option value="${j}" ${s.c[f]===j?"selected":""}>${esc(h||"(без названия)")}</option>`).join("")}</select></label>`;
+    return `<div class="sh ${s.use?"":"off"}"><label class="shh"><input type="checkbox" data-xu="${i}" ${s.use?"checked":""}><b>${esc(s.n)}</b>${s.hid?'<span class="bd">скрыт</span>':""}${s.piv?'<span class="bd">сводная</span>':""}</label>
+     <div class="pv">${b.items.length} объектов · выполнено ${dn} (${b.items.length?Math.round(dn/b.items.length*100):0}%) · ${{status:"по статусу",date:"по дате",none:"статус не найден"}[b.mode]}</div>
+     <div class="sel">${sel("o","Объект")}${sel("r","Ответственный")}${sel("s","Статус")}${sel("d","Дата")}</div></div>`}).join("");L.scrollTop=st}
+$("xlsList").onchange=e=>{const t=e.target;if(t.dataset.xu!==undefined)xs[t.dataset.xu].use=t.checked;if(t.dataset.f)xs[t.dataset.x].c[t.dataset.f]=+t.value;showXls()};
+$("xlsCancel").onclick=()=>$("xlsDlg").close();
+$("xlsGo").onclick=async()=>{const use=xs.filter(s=>s.use);if(!use.length){alert("Выберите хотя бы один лист");return}
+  try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",s.n.replace(/[\/\s.]+/g,"_")),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,upd:Date.now()})}));$("xlsDlg").close()}
+  catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
+
+/* клики */
 document.addEventListener("toggle",e=>{const id=e.target.dataset?.id;if(id)e.target.open?opened.add(id):opened.delete(id)},true);
-document.addEventListener("click",async e=>{const g=a=>e.target.dataset[a];
-  if(g("edit"))openOp(opAll.find(x=>x.id===g("edit")));
-  if(g("delop")&&confirm("Удалить открытие?"))await deleteDoc(doc(db,"openings",g("delop")));
+document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const g=a=>t.dataset[a];
+  if(g("resp")!==undefined){S.resp=S.resp===g("resp")?"":g("resp");save();renderTasks()}
+  if(g("deltask")&&confirm("Удалить задачу с сайта?"))await deleteDoc(doc(db,"tasks",g("deltask")));
   if(g("delto")&&confirm("Убрать магазин из списка ТО?"))await deleteDoc(doc(db,"to_stores",g("delto")))});
 document.addEventListener("change",async e=>{const t=e.target;if(!admin)return;
   if(t.dataset.to)await updateDoc(doc(db,"to_stores",t.dataset.to),{done:t.checked});
-  if(t.dataset.op)await updateDoc(doc(db,"openings",t.dataset.op),{["tasks."+t.dataset.k]:t.checked})});
+  if(t.dataset.t){const tk=tasks.find(x=>x.id===t.dataset.t),items=tk.items.map(x=>({...x}));items[+t.dataset.i].d=t.checked?1:0;
+    await updateDoc(doc(db,"tasks",tk.id),{items,upd:Date.now()})}});
 </script>
 </body>
 </html>
