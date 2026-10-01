@@ -40,7 +40,7 @@ h2{margin:0;font-size:15px}.cnt{color:var(--mute);font-size:13px;font-weight:400
 .to .n{flex:1}.to.done .n{color:var(--mute);text-decoration:line-through}
 .to em{font-style:normal;font-size:11px;font-weight:700;color:var(--bad)}.to.done em{color:var(--ok)}
 input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);flex:none}input[disabled]{opacity:1}
-.add{display:none;gap:8px;margin-top:10px}body.admin .add{display:flex}
+.add{display:none;gap:8px;margin-top:10px}body.toa .add{display:flex}
 .adm{display:none}body.admin .adm{display:inline-block}
 input[type=text],input[type=password],input[type=date],select,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
 input[type=text],input[type=password],textarea{width:100%}
@@ -87,40 +87,61 @@ dialog label.f input,dialog label.f select{width:100%}
 .lks{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:6px}
 .lk{padding:8px 12px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad);color:#ffb4ae}.lk b{color:#fff}.lk span{display:block;color:var(--mute);font-size:12px}
 .lkok{color:var(--ok);font-weight:700;padding:2px 0}#lkSec.alert{border-color:var(--bad)}
-body.locked .wrap{display:none}
-#lockMsg{display:none;max-width:520px;margin:60px auto;padding:0 16px;text-align:center;color:var(--mute)}body.locked #lockMsg{display:block}
+body{font-size:15px}
+.wrap{max-width:none;padding:12px 16px}
+.cols{grid-template-columns:clamp(380px,24%,520px) 1fr;gap:14px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+#toList{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.to{margin-top:0;padding:8px 10px;font-size:16px;min-width:0}
+.to .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.to em{display:none}
+.to .ic{font-weight:800;color:var(--bad);width:17px;text-align:center;flex:none}.to.done .ic{color:var(--ok)}
+.to .dng{padding:0 6px;border:none;background:transparent}
+.tabs{display:flex;gap:6px}.tab{font-weight:700;padding:8px 16px}.tab.on{background:var(--acc);border-color:var(--acc);color:#1a1200}
+.zm{display:flex;gap:6px;align-items:center}.zm span{min-width:46px;text-align:center;color:var(--mute)}
+.badge{display:flex;gap:8px;align-items:center;color:#f0c24a;border-color:#6b5a1a}
+.badge i{width:10px;height:10px;border-radius:50%;background:var(--acc);animation:bl 1.2s infinite}
+.badge.red{color:#ffb4ae;border-color:var(--bad)}.badge.red i{background:var(--bad)}
+@keyframes bl{50%{opacity:.15}}
+.warn{background:#2e2608;border:1px solid #6b5a1a;color:#f0c24a;padding:8px 12px;border-radius:6px;margin-bottom:10px}
+.top .ring{width:72px;height:72px}.top .ring i{width:54px;height:54px;font-size:16px}
+.top h3{font-size:19px}.sub{font-size:14px}.rs{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.rr{font-size:15px}.it{font-size:14px}
+.ok{color:var(--ok)}
+.fa,.ta{display:none}body.full .fa,body.toa .ta{display:inline-block}
+#logList{max-height:60vh;overflow:auto;margin-top:10px;display:grid;gap:6px}
+.lg{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--p2)}.lg b{color:var(--acc)}.lg small{color:var(--mute)}.lg ul{margin:4px 0 0;padding-left:18px}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">КРД<b>.</b>ЗАДАЧИ</div>
-  <button id="loginBtn" class="pri">Вход</button>
+  <button id="loginBtn" class="pri">Вход для админа</button>
   <span class="who" id="who"></span><button id="logoutBtn" class="adm">Выйти</button>
   <div class="sp"></div>
+  <button id="lkBadge" class="badge" title="Статус основных каналов"><i></i><span id="lkBadgeT">Каналы: в разработке</span></button>
+  <button id="logBtn" class="fa">Журнал</button>
+  <div class="zm"><button id="zm1" title="Уменьшить">A−</button><span id="zmv"></span><button id="zm2" title="Увеличить">A+</button></div>
 </header>
-<div id="lockMsg"><h2>Для просмотра войдите в систему</h2><p>Нажмите «Вход» в правом верхнем углу. Учётные записи выдаёт администратор.</p></div>
 <div class="wrap">
-  <section id="lkSec" style="margin-bottom:16px;display:none">
-    <div class="hd"><h2>Статус основных каналов · <span id="lkDate"></span></h2><span class="cnt" id="lkSum"></span><span class="sp"></span><button class="adm" id="lkBtn">Загрузить IP</button></div>
-    <div class="lks" id="lkList"></div>
-  </section>
   <div class="cols">
     <section>
-      <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт</button></div>
+      <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><div style="display:flex;gap:6px"><button id="toOnly" title="Что показывать">Все</button><button class="ta" id="toImp">Импорт</button></div></div>
       <div class="month"><button id="prev" aria-label="Предыдущий месяц">‹</button><span id="mlabel"></span><button id="next" aria-label="Следующий месяц">›</button></div>
       <div class="bar"><i id="toBar"></i></div>
       <div id="toList"></div>
       <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">+</button></div>
     </section>
     <section>
-      <div class="hd"><h2>Задачи <span class="cnt" id="tCnt"></span></h2><div style="display:flex;gap:8px"><button class="adm" id="addBtn">+ Задача / объекты</button><button class="pri adm" id="xlsBtn">Загрузить Excel</button></div><input type="file" id="xlsFile" accept=".xlsx,.xlsm,.xls" hidden></div>
+      <div class="hd"><div class="tabs"><button id="tAct" class="tab"></button><button id="tDone" class="tab"></button></div><span class="cnt" id="tCnt"></span><span class="sp"></span>
+        <div style="display:flex;gap:8px"><button class="fa" id="addBtn">+ Задача / объекты</button><button class="pri fa" id="xlsBtn">Загрузить Excel</button></div><input type="file" id="xlsFile" accept=".xlsx,.xlsm,.xls" hidden></div>
       <div class="fb">
         <input type="text" id="q" placeholder="Поиск по магазину или системотехнику">
         <select id="fr" aria-label="Системотехник"></select>
-        <select id="fs" aria-label="Сортировка">
-          <option value="file">Как в файле</option><option value="pd">% выполнения ↓</option><option value="pa">% выполнения ↑</option>
-          <option value="dd">Выполнено (шт) ↓</option><option value="ld">Осталось (шт) ↓</option>
-        </select>
+        <select id="fs" title="Сортировка системотехников внутри каждой задачи">
+          <option value="pd">Системотехники: % ↓</option><option value="pa">Системотехники: % ↑</option><option value="ld">Системотехники: осталось ↓</option><option value="dd">Системотехники: выполнено ↓</option><option value="az">Системотехники: А–Я</option></select>
+        <select id="ft" title="Порядок задач">
+          <option value="file">Задачи: как в файле</option><option value="pa">Задачи: % ↑ (отстающие первыми)</option><option value="pd">Задачи: % ↓</option><option value="ld">Задачи: осталось ↓</option><option value="dl">Задачи: по сроку</option></select>
+        <select id="fc" title="Сколько задач в ряду">
+          <option value="auto">Колонки: авто</option><option value="1">1 (список)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="row">В одну линию</option></select>
         <label class="chk"><input type="checkbox" id="fo">только невыполненные</label>
         <button id="fx">Сбросить</button>
       </div>
@@ -129,7 +150,7 @@ body.locked .wrap{display:none}
   </div>
 </div>
 
-<dialog id="loginDlg"><h2>Вход</h2>
+<dialog id="loginDlg"><h2>Вход для админа</h2>
   <label class="f">Логин<input type="text" id="lu" autocomplete="username"></label>
   <label class="f">Пароль<input type="password" id="lp" autocomplete="current-password"></label>
   <div class="err" id="lerr"></div>
@@ -145,6 +166,16 @@ body.locked .wrap{display:none}
   <p class="hint">Скрытые листы и сводные сняты по умолчанию. Столбцы определены автоматически, при ошибке поправьте вручную. Статус берётся из столбца «Статус»; если его нет, объект считается выполненным, когда дата уже наступила. «Общий срок» задаёт одну дату на всю задачу (например, до 20 ноября), на выполнение он не влияет. Загрузка заменяет данные этих листов на сайте.</p>
   <div id="xlsList"></div>
   <div class="row"><button id="xlsCancel">Отмена</button><button class="pri" id="xlsGo">Загрузить выбранные</button></div></dialog>
+
+<dialog id="logDlg" class="wide"><h2>Журнал действий</h2>
+  <input type="text" id="logQ" placeholder="Поиск по учётке или тексту">
+  <div id="logList"></div><div class="row"><button id="logClose">Закрыть</button></div></dialog>
+
+<dialog id="lkPanel" class="wide"><div class="warn">🚧 Функция в разработке: автоматический опрос каналов ещё не подключён, данные ниже появятся после запуска агента.</div>
+  <section id="lkSec" style="border:none;padding:0">
+    <div class="hd"><h2>Статус основных каналов · <span id="lkDate"></span></h2><span class="cnt" id="lkSum"></span><span class="sp"></span><button class="fa" id="lkBtn">Загрузить IP</button></div>
+    <div class="lks" id="lkList"></div>
+  </section><div class="row"><button id="lkClose">Закрыть</button></div></dialog>
 
 <dialog id="lkDlg"><h2>Основные каналы: магазины и IP</h2>
   <p class="hint">Два столбца из Excel (название магазина и IP основного канала) или файл .xlsx / .txt. Повторная загрузка обновляет IP у существующих магазинов. IP видны только админам.</p>
@@ -170,7 +201,7 @@ body.locked .wrap{display:none}
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,collection,onSnapshot,addDoc,setDoc,updateDoc,deleteDoc,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,onSnapshot,addDoc,setDoc,updateDoc,deleteDoc,getDoc,query,orderBy,limit,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",authDomain:"krd-tracker.firebaseapp.com",projectId:"krd-tracker",storageBucket:"krd-tracker.firebasestorage.app",messagingSenderId:"506382681336",appId:"1:506382681336:web:e093bf1daba1656685270d"});
 const db=getFirestore(app),auth=getAuth(app),MAIL="@krd.ru";
@@ -180,21 +211,24 @@ const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 const col=p=>p>=80?"var(--ok)":p>=40?"var(--acc)":"var(--bad)";
 const ring=p=>`<div class="ring" style="--v:${p};--c:${col(p)}"><i>${p}%</i></div>`;
 let cur=new Date();cur.setDate(1);
-let admin=false,toAll=[],tasks=[],xs=[],P={};const opened=new Set();
+let admin=false,user=null,role=null,isFull=false,canTO=false,logs=[],toAll=[],tasks=[],xs=[],P={};const opened=new Set();
 
 /* Фильтры хранятся ТОЛЬКО в этом браузере, у других посетителей они не меняются */
-let S={q:"",resp:"",sort:"file",only:false};
+let S={q:"",resp:"",sort:"pd",only:false,tsort:"file",cols:"auto",tab:"act",toOnly:false,zoom:1};
 try{Object.assign(S,JSON.parse(localStorage.getItem("krd_view")||"{}"))}catch{}
 const save=()=>{try{localStorage.setItem("krd_view",JSON.stringify(S))}catch{}};
+if(!["pd","pa","ld","dd","az"].includes(S.sort))S.sort="pd";
 
 function render(){
   const k=key(cur);
+  document.body.style.zoom=S.zoom;$("zmv").textContent=Math.round(S.zoom*100)+"%";$("toOnly").textContent=S.toOnly?"Осталось":"Все";
   $("mlabel").textContent=cur.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
   const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
   const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
   $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
-  $("toList").innerHTML=to.map(x=>{const pv=P["to:"+x.id],v=pv?pv.v:x.done,dl=P["dt:"+x.id];
-    return `<div class="to ${v?"done":""} ${pv?"chg":""} ${dl?"del":""}"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено"><span class="n">${esc(x.name)}</span><em>${v?"выполнено":"не выполнено"}</em>${admin?`<button class="${dl?"":"dng"}" data-delto="${x.id}" title="Убрать из списка">${dl?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
+  const toShow=S.toOnly?to.filter(x=>!x.done):to;
+  $("toList").innerHTML=toShow.map(x=>{const pv=P["to:"+x.id],v=pv?pv.v:x.done,dl=P["dt:"+x.id];
+    return `<div class="to ${v?"done":""} ${pv?"chg":""} ${dl?"del":""}" title="${esc(x.name)}">${canTO?`<input type="checkbox" ${v?"checked":""} data-to="${x.id}" aria-label="ТО выполнено">`:`<span class="ic">${v?"✓":"●"}</span>`}<span class="n">${esc(x.name)}</span>${canTO?`<button class="${dl?"":"dng"}" data-delto="${x.id}" title="Убрать из списка">${dl?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty" style="grid-column:1/-1">${to.length?"✓ Все ТО выполнены":"Магазинов для ТО нет"}</div>`;
 
   renderTasks();
   const n=Object.keys(P).length;$("pbar").classList.toggle("on",admin&&n>0);$("pcnt").textContent="Изменений не применено: "+n;
@@ -202,56 +236,66 @@ function render(){
 
 const dlTxt=(dl,left)=>{if(!dl)return"";const d=new Date(dl+"T12:00:00"),n=Math.round((d-new Date().setHours(12,0,0,0))/864e5),tx="до "+d.toLocaleDateString("ru-RU");
   return !left?tx:n<0?`<span style="color:var(--bad)">${tx} · просрочено на ${-n} дн.</span>`:n===0?`${tx} · сегодня`:`${tx} · осталось ${n} дн.`};
+const isFin=t=>t.items.length>0&&t.items.every(x=>x.d);
+const f2=ms=>new Date(ms).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
+const pc=v=>v.d/v.n;
+const RSORT={pd:(a,b)=>pc(b[1])-pc(a[1])||b[1].n-a[1].n,pa:(a,b)=>pc(a[1])-pc(b[1])||b[1].n-a[1].n,ld:(a,b)=>(b[1].n-b[1].d)-(a[1].n-a[1].d),dd:(a,b)=>b[1].d-a[1].d,az:(a,b)=>a[0].localeCompare(b[0],"ru")};
+const TSORT={file:(a,b)=>a.t.ord-b.t.ord,pa:(a,b)=>a.p-b.p,pd:(a,b)=>b.p-a.p,ld:(a,b)=>b.left-a.left,dl:(a,b)=>(a.t.dl||"9").localeCompare(b.t.dl||"9")};
 function renderTasks(){
   const sc={};document.querySelectorAll(".lst").forEach(l=>{sc[l.dataset.for]=l.scrollTop});
+  const fin=tasks.filter(isFin),act=tasks.filter(t=>!isFin(t)),isD=S.tab==="done",src=isD?fin:act;
+  $("tAct").textContent=`В работе (${act.length})`;$("tDone").textContent=`Выполненные (${fin.length})`;
+  $("tAct").classList.toggle("on",!isD);$("tDone").classList.toggle("on",isD);
   const rs=[...new Set(tasks.flatMap(t=>t.items.map(x=>x.r)))].sort((a,b)=>a.localeCompare(b,"ru"));
   $("fr").innerHTML=`<option value="">Все системотехники</option>`+rs.map(r=>`<option ${r===S.resp?"selected":""}>${esc(r)}</option>`).join("");
   const ql=S.q.trim().toLowerCase();
-  let cs=tasks.map(t=>{
+  const cs=src.map(t=>{
     const base=t.items.map((x,i)=>({...x,i})).filter(x=>(!S.resp||x.r===S.resp)&&(!ql||(x.o+" "+x.r).toLowerCase().includes(ql)));
     const dn=base.filter(x=>x.d).length;
     return {t,base,dn,tot:base.length,left:base.length-dn,p:base.length?dn/base.length*100:0};
-  }).filter(c=>c.tot&&(!S.only||c.left));
-  const so={pd:(a,b)=>b.p-a.p,pa:(a,b)=>a.p-b.p,dd:(a,b)=>b.dn-a.dn,ld:(a,b)=>b.left-a.left,file:(a,b)=>a.t.ord-b.t.ord}[S.sort]||(()=>0);
-  cs.sort(so);
-  $("tCnt").textContent=tasks.length?`показано ${cs.length} из ${tasks.length}`:"";
+  }).filter(c=>c.tot&&(isD||!S.only||c.left)).sort(TSORT[S.tsort]||TSORT.file);
+  $("tCnt").textContent=src.length?`показано ${cs.length} из ${src.length}`:"";
+  const n=cs.length,w=$("tasks").clientWidth||1200;
+  let nc=S.cols==="auto"?(n<=1?1:n<=4?2:n<=6?3:4):S.cols==="row"?Math.max(n,1):+S.cols;
+  nc=Math.max(1,Math.min(nc,Math.floor(w/330)||1));
+  $("tasks").style.gridTemplateColumns=`repeat(${nc},minmax(0,1fr))`;
   $("tasks").innerHTML=cs.map(c=>{
     const t=c.t,p=Math.round(c.p),g={},kd=!!P["dk:"+t.id],pl=P["dl:"+t.id],dlv=pl?pl.v:(t.dl||"");
     c.base.forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
-    const list=(S.only?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
+    const list=(S.only&&!isD?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
     const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден",manual:"добавлено вручную"}[t.mode]||"";
+    const td=Math.max(0,...t.items.map(x=>x.td||0));
     return `<div class="tc ${p===100?"full":""} ${kd?"tdel":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
      <div class="top">${ring(p)}<div class="gr"><h3>${esc(t.name)}</h3>
       <div class="sub">Выполнено <b>${c.dn}</b> из <b>${c.tot}</b> · осталось <b>${c.left}</b></div>
-      ${admin||dlv?`<div class="sub">Срок: ${admin?`<input type="date" data-dl="${t.id}" value="${dlv}" style="padding:1px 6px;${pl?"border-color:var(--acc)":""}"> `:""}${dlTxt(dlv,c.left)}</div>`:""}
-      <div class="sub2">${mode} · обновлено ${new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
-      ${admin?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button><button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
+      ${isFull||dlv?`<div class="sub">Срок: ${isFull?`<input type="date" data-dl="${t.id}" value="${dlv}" style="padding:1px 6px;${pl?"border-color:var(--acc)":""}"> `:""}${dlTxt(dlv,c.left)}</div>`:""}
+      <div class="sub2">${mode} · ${isFin(t)&&td?"закрыта "+f2(td):"обновлено "+new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
+      ${isFull?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button>${isD?"":`<button class="ok" data-markall="${t.id}" title="Отметить ВСЕ объекты выполненными">✓</button>`}<button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
      <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
-     <div class="rs">${Object.entries(g).sort((a,b)=>b[1].n-a[1].n).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
+     <div class="rs">${Object.entries(g).sort(RSORT[S.sort]||RSORT.pd).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
        return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
      <details data-id="${t.id}" ${opened.has(t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst" data-for="${t.id}">
-      ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`];
-        return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}${admin?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
-    ||`<div class="empty" style="grid-column:1/-1">${tasks.length?"Ничего не найдено по фильтрам":"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»"}</div>`;
+      ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`],dt=x.d&&x.td?f2(x.td):(x.t||"");
+        return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${isFull?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${dt?`<span class="dt">${dt}</span>`:""}${isFull?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
+    ||`<div class="empty" style="grid-column:1/-1">${!tasks.length?"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»":isD&&!fin.length?"Выполненных задач пока нет":!isD&&!act.length?"🎉 Все задачи выполнены. Они во вкладке «Выполненные»":"Ничего не найдено по фильтрам"}</div>`;
   document.querySelectorAll(".lst").forEach(l=>{if(sc[l.dataset.for])l.scrollTop=sc[l.dataset.for]});
 }
 
-let unsubs=[];
-function stopData(){unsubs.forEach(u=>u());unsubs=[];toAll=[];tasks=[];links=[];meta=null}
-function startData(){stopData();const er=e=>console.warn("Firestore:",e.code||e);unsubs=[
-  onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()},er),
-  onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()},er),
-  onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()},er),
-  onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()},er)]}
-onAuthStateChanged(auth,async u=>{const ok=!!u;
-  /* админ = у пользователя есть документ admins/<его uid> в Firestore (создаётся вручную в консоли Firebase) */
-  admin=false;if(ok){try{admin=(await getDoc(doc(db,"admins",u.uid))).exists()}catch{admin=false}}
-  if(ok)startData();else{stopData();P={}}
-  document.body.classList.toggle("locked",!ok);document.body.classList.toggle("admin",admin);
-  $("loginBtn").style.display=ok?"none":"";$("logoutBtn").style.display=ok?"inline-block":"none";
-  $("who").textContent=u?u.email.replace(MAIL,"")+(admin?" (админ)":""):"";
+onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
+onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()});
+let unsubLogs=null;
+onAuthStateChanged(auth,async u=>{
+  user=u;role=null;
+  if(u){try{const r=await getDoc(doc(db,"roles",u.email));role=r.exists()?r.data().role:null}catch{}}
+  admin=!!u&&!!role;isFull=role==="full";canTO=isFull||role==="to";
+  const b=document.body.classList;b.toggle("admin",admin);b.toggle("full",isFull);b.toggle("toa",canTO);
+  $("loginBtn").style.display=u?"none":"";
+  $("who").textContent=u?`${u.email.replace(MAIL,"")} (${isFull?"FULL-ADMIN":canTO?"TO-ADMIN":"нет прав, только просмотр"})`:"";
+  if(!admin)P={};
+  if(unsubLogs){unsubLogs();unsubLogs=null}logs=[];
+  if(isFull)unsubLogs=onSnapshot(query(collection(db,"logs"),orderBy("ts","desc"),limit(300)),s=>{logs=s.docs.map(d=>d.data());renderLogs()},()=>{});
   renderLinks();render();
-  if(!ok&&!$("loginDlg").open)$("loginDlg").showModal()});
+});
 
 /* вход */
 $("loginBtn").onclick=()=>{$("lerr").textContent="";$("loginDlg").showModal()};
@@ -263,7 +307,7 @@ $("logoutBtn").onclick=()=>signOut(auth);
 /* ТО */
 $("prev").onclick=()=>{cur.setMonth(cur.getMonth()-1);render()};
 $("next").onclick=()=>{cur.setMonth(cur.getMonth()+1);render()};
-$("toAdd").onclick=async()=>{const n=$("toName").value.trim();if(!n)return;await addDoc(collection(db,"to_stores"),{name:n,month:key(cur),done:false});$("toName").value=""};
+$("toAdd").onclick=async()=>{const n=$("toName").value.trim();if(!n)return;await addDoc(collection(db,"to_stores"),{name:n,month:key(cur),done:false});$("toName").value="";logAct(`ТО · добавлен магазин «${n}» (${key(cur)})`)};
 $("toName").onkeydown=e=>{if(e.key==="Enter")$("toAdd").click()};
 $("toImp").onclick=()=>{$("impTxt").value="";$("impDlg").showModal()};
 $("impCancel").onclick=()=>$("impDlg").close();
@@ -271,15 +315,23 @@ $("impFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=a
   try{$("impTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("impTxt").value=new TextDecoder("windows-1251").decode(b)}e.target.value=""};
 $("impGo").onclick=async()=>{const k=key(cur),ex=new Set(toAll.filter(x=>x.month===k).map(x=>x.name.toLowerCase())),jobs=[];
   for(const n of $("impTxt").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)){if(ex.has(n.toLowerCase()))continue;ex.add(n.toLowerCase());jobs.push(addDoc(collection(db,"to_stores"),{name:n,month:k,done:false}))}
-  try{await Promise.all(jobs);$("impDlg").close();alert("Добавлено: "+jobs.length)}catch{alert("Ошибка записи. Войдите как админ")}};
+  try{await Promise.all(jobs);$("impDlg").close();logAct(`ТО · импорт списком: добавлено магазинов ${jobs.length} (${k})`);alert("Добавлено: "+jobs.length)}catch{alert("Ошибка записи. Войдите как админ")}};
 
-/* локальные фильтры */
-$("q").value=S.q;$("fs").value=S.sort;$("fo").checked=S.only;
+/* локальные настройки вида (только в этом браузере) */
+$("q").value=S.q;$("fs").value=S.sort;$("ft").value=S.tsort;$("fc").value=S.cols;$("fo").checked=S.only;
 $("q").oninput=e=>{S.q=e.target.value;save();renderTasks()};
 $("fr").onchange=e=>{S.resp=e.target.value;save();renderTasks()};
 $("fs").onchange=e=>{S.sort=e.target.value;save();renderTasks()};
+$("ft").onchange=e=>{S.tsort=e.target.value;save();renderTasks()};
+$("fc").onchange=e=>{S.cols=e.target.value;save();renderTasks()};
 $("fo").onchange=e=>{S.only=e.target.checked;save();renderTasks()};
-$("fx").onclick=()=>{S={q:"",resp:"",sort:"file",only:false};save();$("q").value="";$("fs").value="file";$("fo").checked=false;renderTasks()};
+$("fx").onclick=()=>{S={...S,q:"",resp:"",sort:"pd",only:false,tsort:"file",cols:"auto"};save();$("q").value="";$("fs").value="pd";$("ft").value="file";$("fc").value="auto";$("fo").checked=false;renderTasks()};
+$("tAct").onclick=()=>{S.tab="act";save();renderTasks()};$("tDone").onclick=()=>{S.tab="done";save();renderTasks()};
+const zoom=d=>{S.zoom=Math.min(2.4,Math.max(.6,Math.round((S.zoom+d)*10)/10));save();render()};
+$("zm1").onclick=()=>zoom(-.1);$("zm2").onclick=()=>zoom(.1);
+$("toOnly").onclick=()=>{S.toOnly=!S.toOnly;save();render()};
+$("lkBadge").onclick=()=>$("lkPanel").showModal();$("lkClose").onclick=()=>$("lkPanel").close();
+addEventListener("resize",()=>renderTasks());
 
 /* разбор Excel */
 const sid=n=>n.replace(/[\/\s.]+/g,"_");
@@ -317,7 +369,7 @@ function showXls(){const L=$("xlsList"),st=L.scrollTop;
 $("xlsList").onchange=e=>{const t=e.target;if(t.dataset.xd!==undefined)xs[t.dataset.xd].dl=t.value;if(t.dataset.xu!==undefined)xs[t.dataset.xu].use=t.checked;if(t.dataset.f)xs[t.dataset.x].c[t.dataset.f]=+t.value;showXls()};
 $("xlsCancel").onclick=()=>$("xlsDlg").close();
 $("xlsGo").onclick=async()=>{const use=xs.filter(s=>s.use);if(!use.length){alert("Выберите хотя бы один лист");return}
-  try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",sid(s.n)),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,dl:s.dl||"",upd:Date.now()})}));$("xlsDlg").close()}
+  try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",sid(s.n)),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,dl:s.dl||"",upd:Date.now()})}));$("xlsDlg").close();logAct("Загружен Excel: листы "+use.map(s=>"«"+s.n+"»").join(", "))}
   catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
 
 /* статус основных каналов (опрашивает ping_agent.py, сайт только показывает) */
@@ -327,11 +379,14 @@ const fmt=ms=>{const d=new Date(ms);return `${p2(d.getDate())}.${p2(d.getMonth()
 const dur=ms=>{const m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} дн. ${h} ч`:h?`${h} ч ${m%60} мин`:`${m} мин`};
 function renderLinks(){
   const down=links.filter(x=>x.up===false).sort((a,b)=>a.since-b.since),up=links.filter(x=>x.up===true).length,tot=links.length;
-  $("lkSec").style.display=tot||admin?"":"none";$("lkSec").classList.toggle("alert",down.length>0);
+$("lkSec").classList.toggle("alert",down.length>0);
   $("lkDate").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
   const stale=meta&&Date.now()-meta.last>15*6e4;
+  $("lkBadge").className=down.length&&!stale?"badge red":"badge";$("lkBadgeT").textContent=down.length&&!stale?`Каналы: не в сети ${down.length}`:"Каналы: в разработке";
   $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
   $("lkList").innerHTML=down.length?down.map(x=>`<div class="lk"><b>${esc(x.name)}</b> — основной канал не в сети<span>с ${fmt(x.since)} · ${dur(Date.now()-x.since)}</span></div>`).join(""):(tot&&up===tot?`<div class="lkok">✓ Все основные каналы в сети</div>`:"")}
+onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()});
+onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()});
 setInterval(renderLinks,6e4);
 const IPV4=/\b(?:\d{1,3}\.){3}\d{1,3}\b/;
 const parseLinks=txt=>txt.split(/\r?\n/).flatMap(l=>{const m=l.match(IPV4);if(!m)return[];const c=l.split(/\t|;/).map(x=>x.trim()).filter(Boolean);
@@ -344,8 +399,14 @@ $("lkFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=aw
   else try{$("lkTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("lkTxt").value=new TextDecoder("windows-1251").decode(b)}
   e.target.value="";$("lkTxt").oninput()};
 $("lkGo").onclick=async()=>{const it=parseLinks($("lkTxt").value);if(!it.length){alert("IP-адреса не найдены");return}
-  try{await Promise.all(it.flatMap(x=>{const id=sid(x.name);return[setDoc(doc(db,"link_cfg",id),{name:x.name,ip:x.ip}),setDoc(doc(db,"links",id),{name:x.name},{merge:true})]}));$("lkDlg").close();alert("Загружено магазинов: "+it.length)}
+  try{await Promise.all(it.flatMap(x=>{const id=sid(x.name);return[setDoc(doc(db,"link_cfg",id),{name:x.name,ip:x.ip}),setDoc(doc(db,"links",id),{name:x.name},{merge:true})]}));$("lkDlg").close();logAct(`Каналы: загружено IP-адресов ${it.length}`);alert("Загружено магазинов: "+it.length)}
   catch{alert("Ошибка записи. Войдите как админ и проверьте правила Firestore")}};
+
+/* журнал действий */
+const logAct=async lines=>{try{if(!user||!role)return;await addDoc(collection(db,"logs"),{ts:Date.now(),user:user.email.replace(MAIL,""),role,text:(Array.isArray(lines)?lines:[lines]).slice(0,60)})}catch{}};
+function renderLogs(){const q=$("logQ").value.trim().toLowerCase();
+  $("logList").innerHTML=logs.filter(l=>!q||(l.user+" "+(l.text||[]).join(" ")).toLowerCase().includes(q)).map(l=>`<div class="lg"><small>${fmt(l.ts)}</small> · <b>${esc(l.user)}</b> <small>(${l.role==="full"?"FULL-ADMIN":"TO-ADMIN"})</small><ul>${(l.text||[]).map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`).join("")||`<div class="empty">Записей нет</div>`}
+$("logBtn").onclick=()=>{renderLogs();$("logDlg").showModal()};$("logQ").oninput=renderLogs;$("logClose").onclick=()=>$("logDlg").close();
 
 /* ручное добавление */
 function openAdd(id){$("aTask").innerHTML=`<option value="">+ Новая задача</option>`+tasks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");
@@ -358,35 +419,37 @@ $("aGo").onclick=async()=>{const id=$("aTask").value,nm=$("aName").value.trim(),
   if(!items.length){$("aerr").textContent="Добавьте хотя бы один объект";return}
   try{if(id){const tk=tasks.find(t=>t.id===id);await updateDoc(doc(db,"tasks",id),{items:[...tk.items,...items],upd:Date.now(),dl})}
     else await setDoc(doc(db,"tasks","m_"+Date.now()),{name:nm,items,mode:"manual",ord:Math.max(-1,...tasks.map(t=>t.ord))+1,dl,upd:Date.now()});
-    $("addDlg").close()}catch{$("aerr").textContent="Ошибка записи. Проверьте вход админа"}};
+    logAct(id?`«${tn(id).name}»: добавлено объектов ${items.length}`:`Новая задача «${nm}»: объектов ${items.length}`);$("addDlg").close()}catch{$("aerr").textContent="Ошибка записи. Проверьте вход админа"}};
 
 /* отложенные изменения: сначала отмечаем, потом «Применить» */
 const tog=(k,v)=>{if(P[k])delete P[k];else P[k]=v;render()};
 const tn=id=>tasks.find(t=>t.id===id);
-function describe(){const out=[];
+function describe(){const out=[],grp={};
   for(const p of Object.values(P)){
     if(["it","di","dl"].includes(p.k)&&P["dk:"+p.id])continue;
     const t=tn(p.id),x=toAll.find(y=>y.id===p.id);
     if(p.k==="to")out.push(`ТО · ${x?.name}: ${p.v?"будет отмечено выполненным":"будет снята отметка «выполнено»"}`);
     if(p.k==="dt")out.push(`ТО · УДАЛИТЬ магазин «${x?.name}» из списка`);
     if(p.k==="dk")out.push(`УДАЛИТЬ задачу «${t?.name}» целиком (${t?.items.length} объектов)`);
-    if(p.k==="it")out.push(`«${t?.name}» · ${t?.items[p.i].o}: ${p.v?"будет отмечено выполненным":"будет снята отметка «выполнено»"}`);
+    if(p.k==="it")(grp[p.id+"|"+p.v]??=[]).push(t?.items[p.i].o);
     if(p.k==="di")out.push(`«${t?.name}» · УДАЛИТЬ объект ${t?.items[p.i].o}`);
     if(p.k==="dl")out.push(`«${t?.name}» · срок: ${t?.dl||"не задан"} → ${p.v||"убрать срок"}`)}
+  for(const k in grp){const j=k.lastIndexOf("|"),t=tn(k.slice(0,j)),v=k.slice(j+1),a=grp[k];
+    out.push(`«${t?.name}»: ${v==="1"?"будет отмечено выполненными":"будет снята отметка «выполнено»"}, объектов: ${a.length} (${a.slice(0,8).join(", ")}${a.length>8?` и ещё ${a.length-8}`:""})`)}
   return out}
 $("pundo").onclick=()=>{P={};render()};
 $("papply").onclick=()=>{$("cfmList").innerHTML=describe().map(l=>`<li>${esc(l)}</li>`).join("");$("cfmDlg").showModal()};
 $("cfmNo").onclick=()=>$("cfmDlg").close();
-$("cfmYes").onclick=async()=>{const jobs=[],by={};
+$("cfmYes").onclick=async()=>{const jobs=[],by={},lines=describe();
   for(const p of Object.values(P)){
     if(p.k==="to")jobs.push(updateDoc(doc(db,"to_stores",p.id),{done:p.v}));
     else if(p.k==="dt")jobs.push(deleteDoc(doc(db,"to_stores",p.id)));
     else if(p.k==="dk")jobs.push(deleteDoc(doc(db,"tasks",p.id)));
     else(by[p.id]??=[]).push(p)}
   for(const id in by){if(P["dk:"+id]||!tn(id))continue;const items=tn(id).items.map(x=>({...x})),del=new Set(),u={upd:Date.now()};
-    for(const p of by[id]){if(p.k==="it")items[p.i].d=p.v;else if(p.k==="di")del.add(p.i);else if(p.k==="dl")u.dl=p.v}
+    for(const p of by[id]){if(p.k==="it"){items[p.i].d=p.v;if(p.v)items[p.i].td=Date.now();else delete items[p.i].td}else if(p.k==="di")del.add(p.i);else if(p.k==="dl")u.dl=p.v}
     u.items=items.filter((_,i)=>!del.has(i));jobs.push(updateDoc(doc(db,"tasks",id),u))}
-  try{await Promise.all(jobs);P={};$("cfmDlg").close();render()}catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
+  try{await Promise.all(jobs);logAct(lines);P={};$("cfmDlg").close();render()}catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
 addEventListener("beforeunload",e=>{if(Object.keys(P).length){e.preventDefault();e.returnValue=""}});
 
 /* клики */
@@ -394,13 +457,15 @@ document.addEventListener("toggle",e=>{const id=e.target.dataset?.id;if(id)e.tar
 document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const g=a=>t.dataset[a];
   if(g("resp")!==undefined){S.resp=S.resp===g("resp")?"":g("resp");save();renderTasks()}
   if(g("addto"))openAdd(g("addto"));
+  if(g("markall")){const tk=tn(g("markall")),kk=i=>`it:${tk.id}:${i}`,st=tk.items.map((x,i)=>P[kk(i)]?P[kk(i)].v:x.d);
+    if(st.every(Boolean))tk.items.forEach((x,i)=>delete P[kk(i)]);else tk.items.forEach((x,i)=>{if(!x.d)P[kk(i)]={k:"it",id:tk.id,i,v:1}});render()}
   if(g("deltask"))tog("dk:"+g("deltask"),{k:"dk",id:g("deltask")});
   if(g("delto"))tog("dt:"+g("delto"),{k:"dt",id:g("delto")});
   if(g("delit")){const v=g("delit"),c=v.lastIndexOf(":");tog("di:"+v,{k:"di",id:v.slice(0,c),i:+v.slice(c+1)})}});
 document.addEventListener("change",e=>{const t=e.target;if(!admin)return;
-  if(t.dataset.to){const x=toAll.find(y=>y.id===t.dataset.to),k="to:"+x.id;if(t.checked===!!x.done)delete P[k];else P[k]={k:"to",id:x.id,v:t.checked};render()}
-  if(t.dataset.t){const tk=tn(t.dataset.t),i=+t.dataset.i,k=`it:${tk.id}:${i}`,v=t.checked?1:0;if(v===tk.items[i].d)delete P[k];else P[k]={k:"it",id:tk.id,i,v};render()}
-  if(t.dataset.dl){const tk=tn(t.dataset.dl),k="dl:"+tk.id;if(t.value===(tk.dl||""))delete P[k];else P[k]={k:"dl",id:tk.id,v:t.value};render()}});
+  if(t.dataset.to&&canTO){const x=toAll.find(y=>y.id===t.dataset.to),k="to:"+x.id;if(t.checked===!!x.done)delete P[k];else P[k]={k:"to",id:x.id,v:t.checked};render()}
+  if(t.dataset.t&&isFull){const tk=tn(t.dataset.t),i=+t.dataset.i,k=`it:${tk.id}:${i}`,v=t.checked?1:0;if(v===tk.items[i].d)delete P[k];else P[k]={k:"it",id:tk.id,i,v};render()}
+  if(t.dataset.dl&&isFull){const tk=tn(t.dataset.dl),k="dl:"+tk.id;if(t.value===(tk.dl||""))delete P[k];else P[k]={k:"dl",id:tk.id,v:t.value};render()}});
 </script>
 </body>
 </html>
