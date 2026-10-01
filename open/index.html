@@ -48,12 +48,17 @@ textarea{min-height:160px;margin-top:8px}
 .fb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .fb input[type=text]{flex:1;min-width:220px;width:auto}
 .chk{display:flex;gap:6px;align-items:center;color:var(--mute);white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
-.tc{background:var(--p2);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid.g1{grid-template-columns:1fr}.grid.g2,.grid.g3,.grid.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.g5,.grid.g6{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.g7,.grid.g8,.grid.g9,.grid.g10,.grid.g11,.grid.g12{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1250px){.grid.g5,.grid.g6,.grid.g7,.grid.g8,.grid.g9,.grid.g10,.grid.g11,.grid.g12{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.grid,.grid.g2,.grid.g3,.grid.g4,.grid.g5,.grid.g6,.grid.g7,.grid.g8,.grid.g9,.grid.g10,.grid.g11,.grid.g12{grid-template-columns:1fr}}
+.tc{background:var(--p2);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:16px;min-width:0}
 .tc.full{border-top-color:var(--ok)}
 .top{display:flex;gap:12px;align-items:center;margin-bottom:10px}.top .gr{flex:1}
 .top .ring{width:64px;height:64px}.top .ring i{width:48px;height:48px;font-size:14px;background:var(--p2)}
-.top h3{margin:0;font-size:16px}.sub{color:var(--mute);font-size:13px}.sub b{color:var(--ink)}.sub2{color:var(--mute);font-size:12px}
+.top h3{margin:0;font-size:19px;line-height:1.25}.sub{color:var(--mute);font-size:14px}.sub b{color:var(--ink)}.sub2{color:var(--mute);font-size:12px}
 .rs{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:10px}
 .rr{display:grid;grid-template-columns:1fr auto 38px;gap:0 6px;align-items:center;text-align:left;padding:4px 6px;border-radius:6px;font-size:13px;background:transparent}
 .rr.on{border-color:var(--acc);background:var(--p)}
@@ -89,6 +94,22 @@ dialog label.f input,dialog label.f select{width:100%}
 .lkok{color:var(--ok);font-weight:700;padding:2px 0}#lkSec.alert{border-color:var(--bad)}
 body.locked .wrap{display:none}
 #lockMsg{display:none;max-width:520px;margin:60px auto;padding:0 16px;text-align:center;color:var(--mute)}body.locked #lockMsg{display:block}
+ 
+.devPanel{display:none;background:var(--p);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:16px}
+.devPanel.show{display:block}
+.devStatus{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--mute)}
+.devDot{width:9px;height:9px;border-radius:50%;background:var(--acc);display:inline-block}
+.devDot.bad{background:var(--bad);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.archiveBtn{position:relative}.archiveBadge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--line);font-size:11px;margin-left:5px}
+.cardTools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cardTools select{font-size:12px;padding:4px 7px}
+.bulk{font-size:12px;padding:5px 8px}
+.completedSec{display:none}
+.completedSec.show{display:block}
+.doneCard{border-top-color:var(--ok)}
+.toList.collapsed{display:none}
+@media(min-width:1400px){.tc{padding:18px}.top .ring{width:70px;height:70px}.top .ring i{width:52px;height:52px;font-size:15px}.sub{font-size:15px}.sub2{font-size:13px}}
 </style>
 </head>
 <body>
@@ -97,6 +118,9 @@ body.locked .wrap{display:none}
   <button id="loginBtn" class="pri">Вход</button>
   <span class="who" id="who"></span><button id="logoutBtn" class="adm">Выйти</button>
   <div class="sp"></div>
+  <span class="devStatus" id="devStatus" title="Статус основных каналов"><i class="devDot" id="devDot"></i><span id="devStatusText">Каналы</span></span>
+  <button class="adm" id="devBtn">Разработка</button>
+  <button class="adm archiveBtn" id="archiveBtn">Выполненные <span class="archiveBadge" id="archiveCnt">0</span></button>
 </header>
 <div id="lockMsg"><h2>Для просмотра войдите в систему</h2><p>Нажмите «Вход» в правом верхнем углу. Учётные записи выдаёт администратор.</p></div>
 <div class="wrap">
@@ -106,10 +130,10 @@ body.locked .wrap{display:none}
   </section>
   <div class="cols">
     <section>
-      <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><button class="adm" id="toImp">Импорт</button></div>
+      <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><div class="cardTools"><button id="toToggle" title="Показать/скрыть список">▼</button><button class="adm" id="toImp">Импорт</button></div></div>
       <div class="month"><button id="prev" aria-label="Предыдущий месяц">‹</button><span id="mlabel"></span><button id="next" aria-label="Следующий месяц">›</button></div>
       <div class="bar"><i id="toBar"></i></div>
-      <div id="toList"></div>
+      <div id="toList" class="toList"></div>
       <div class="add"><input type="text" id="toName" placeholder="Название магазина"><button class="pri" id="toAdd">+</button></div>
     </section>
     <section>
@@ -122,11 +146,15 @@ body.locked .wrap{display:none}
           <option value="dd">Выполнено (шт) ↓</option><option value="ld">Осталось (шт) ↓</option>
         </select>
         <label class="chk"><input type="checkbox" id="fo">только невыполненные</label>
-        <button id="fx">Сбросить</button>
+        <button id="fx">Сбросить</button><span class="cnt">Сортировка внутри карточки — отдельно</span>
       </div>
       <div class="grid" id="tasks"></div>
     </section>
   </div>
+  <section id="completedSec" class="completedSec" style="margin-top:16px">
+    <div class="hd"><h2>Выполненные задачи <span class="cnt" id="completedHint"></span></h2><button id="archiveClose">Скрыть</button></div>
+    <div class="grid g2" id="completedTasks"></div>
+  </section>
 </div>
 
 <dialog id="loginDlg"><h2>Вход</h2>
@@ -195,7 +223,7 @@ function render(){
   $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
   $("toList").innerHTML=to.map(x=>{const pv=P["to:"+x.id],v=pv?pv.v:x.done,dl=P["dt:"+x.id];
     return `<div class="to ${v?"done":""} ${pv?"chg":""} ${dl?"del":""}"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-to="${x.id}" aria-label="ТО выполнено"><span class="n">${esc(x.name)}</span><em>${v?"выполнено":"не выполнено"}</em>${admin?`<button class="${dl?"":"dng"}" data-delto="${x.id}" title="Убрать из списка">${dl?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Магазинов для ТО нет</div>`;
-
+  $("toToggle").textContent=$("toList").classList.contains("collapsed")?"▶":"▼";
   renderTasks();
   const n=Object.keys(P).length;$("pbar").classList.toggle("on",admin&&n>0);$("pcnt").textContent="Изменений не применено: "+n;
 }
@@ -204,7 +232,7 @@ const dlTxt=(dl,left)=>{if(!dl)return"";const d=new Date(dl+"T12:00:00"),n=Math.
   return !left?tx:n<0?`<span style="color:var(--bad)">${tx} · просрочено на ${-n} дн.</span>`:n===0?`${tx} · сегодня`:`${tx} · осталось ${n} дн.`};
 function renderTasks(){
   const sc={};document.querySelectorAll(".lst").forEach(l=>{sc[l.dataset.for]=l.scrollTop});
-  const rs=[...new Set(tasks.flatMap(t=>t.items.map(x=>x.r)))].sort((a,b)=>a.localeCompare(b,"ru"));
+  const rs=[...new Set(tasks.flatMap(t=>t.items.map(x=>x.r)))].filter(Boolean).sort((a,b)=>a.localeCompare(b,"ru"));
   $("fr").innerHTML=`<option value="">Все системотехники</option>`+rs.map(r=>`<option ${r===S.resp?"selected":""}>${esc(r)}</option>`).join("");
   const ql=S.q.trim().toLowerCase();
   let cs=tasks.map(t=>{
@@ -212,28 +240,57 @@ function renderTasks(){
     const dn=base.filter(x=>x.d).length;
     return {t,base,dn,tot:base.length,left:base.length-dn,p:base.length?dn/base.length*100:0};
   }).filter(c=>c.tot&&(!S.only||c.left));
-  const so={pd:(a,b)=>b.p-a.p,pa:(a,b)=>a.p-b.p,dd:(a,b)=>b.dn-a.dn,ld:(a,b)=>b.left-a.left,file:(a,b)=>a.t.ord-b.t.ord}[S.sort]||(()=>0);
-  cs.sort(so);
-  $("tCnt").textContent=tasks.length?`показано ${cs.length} из ${tasks.length}`:"";
-  $("tasks").innerHTML=cs.map(c=>{
+  const active=cs.filter(c=>c.p<100),completed=cs.filter(c=>c.p===100);
+  const so={pd:(a,b)=>b.p-a.p,pa:(a,b)=>a.p-b.p,dd:(a,b)=>b.dn-a.dn,ld:(a,b)=>b.left-a.left,file:(a,b)=>a.t.ord-b.t.ord}[S.sort]||((a,b)=>a.t.ord-b.t.ord);
+  active.sort(so); completed.sort((a,b)=>a.t.ord-b.t.ord);
+  $("tCnt").textContent=tasks.length?`активных ${active.length} · выполнено ${completed.length}`:"";
+  $("archiveCnt").textContent=completed.length;
+
+  const renderCard=(c,isArchive=false)=>{
     const t=c.t,p=Math.round(c.p),g={},kd=!!P["dk:"+t.id],pl=P["dl:"+t.id],dlv=pl?pl.v:(t.dl||"");
     c.base.forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
-    const list=(S.only?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
+    const respSortKey=`rsort:${t.id}`,rsort=localStorage.getItem(respSortKey)||"file";
+    const list=(S.only?c.base.filter(x=>!x.d):c.base).sort((a,b)=>{
+      if(rsort==="pd") return (b.d-a.d)||a.r.localeCompare(b.r,"ru")||a.o.localeCompare(b.o,"ru");
+      if(rsort==="pa") return (a.d-b.d)||a.r.localeCompare(b.r,"ru")||a.o.localeCompare(b.o,"ru");
+      if(rsort==="name") return a.r.localeCompare(b.r,"ru")||a.o.localeCompare(b.o,"ru");
+      return a.d-b.d||a.o.localeCompare(b.o,"ru");
+    });
     const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден",manual:"добавлено вручную"}[t.mode]||"";
-    return `<div class="tc ${p===100?"full":""} ${kd?"tdel":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
-     <div class="top">${ring(p)}<div class="gr"><h3>${esc(t.name)}</h3>
-      <div class="sub">Выполнено <b>${c.dn}</b> из <b>${c.tot}</b> · осталось <b>${c.left}</b></div>
-      ${admin||dlv?`<div class="sub">Срок: ${admin?`<input type="date" data-dl="${t.id}" value="${dlv}" style="padding:1px 6px;${pl?"border-color:var(--acc)":""}"> `:""}${dlTxt(dlv,c.left)}</div>`:""}
-      <div class="sub2">${mode} · обновлено ${new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
-      ${admin?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button><button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
-     <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
-     <div class="rs">${Object.entries(g).sort((a,b)=>b[1].n-a[1].n).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
-       return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
-     <details data-id="${t.id}" ${opened.has(t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst" data-for="${t.id}">
-      ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`];
-        return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}${admin?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
-    ||`<div class="empty" style="grid-column:1/-1">${tasks.length?"Ничего не найдено по фильтрам":"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»"}</div>`;
-  document.querySelectorAll(".lst").forEach(l=>{if(sc[l.dataset.for])l.scrollTop=sc[l.dataset.for]});
+    const unfinished=c.base.filter(x=>!x.d).length;
+    return `<div class="tc ${p===100?"full doneCard":""} ${kd?"tdel":""}" style="${p<100?`border-top-color:${col(p)}`:""}">
+      <div class="top">${ring(p)}<div class="gr"><h3>${esc(t.name)}</h3>
+       <div class="sub">Выполнено <b>${c.dn}</b> из <b>${c.tot}</b> · осталось <b>${c.left}</b></div>
+       ${admin||dlv?`<div class="sub">Срок: ${admin?`<input type="date" data-dl="${t.id}" value="${dlv}" style="padding:1px 6px;${pl?"border-color:var(--acc)":""}"> `:""}${dlTxt(dlv,c.left)}</div>`:""}
+       <div class="sub2">${mode} · обновлено ${new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
+       ${admin?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button><button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
+      <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
+      <div class="rs">${Object.entries(g).sort((a,b)=>{
+        if(rsort==="pd")return (b[1].d/b[1].n)-(a[1].d/a[1].n);
+        if(rsort==="pa")return (a[1].d/a[1].n)-(b[1].d/b[1].n);
+        if(rsort==="name")return a[0].localeCompare(b[0],"ru");
+        return b[1].n-a[1].n;
+      }).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
+        return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
+      <div class="cardTools" style="margin-top:10px">
+        <span class="cnt">Сортировка:</span>
+        <select data-rsort="${t.id}" aria-label="Сортировка системотехников">
+          <option value="file" ${rsort==="file"?"selected":""}>как в файле</option>
+          <option value="pd" ${rsort==="pd"?"selected":""}>% ↓</option>
+          <option value="pa" ${rsort==="pa"?"selected":""}>% ↑</option>
+          <option value="name" ${rsort==="name"?"selected":""}>ФИО А–Я</option>
+        </select>
+        ${admin&&!isArchive&&unfinished?`<button class="bulk" data-bulk="${t.id}">☑ Выбрать невыполненные (${unfinished})</button>`:""}
+      </div>
+      <details data-id="${t.id}" ${opened.has(t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst" data-for="${t.id}">
+       ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`];
+         return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${admin?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${x.t?`<span class="dt">${x.t}</span>`:""}${admin?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`;
+  };
+  const tg=$("tasks");tg.className="grid g"+Math.min(Math.max(active.length,1),12);
+  tg.innerHTML=active.map(c=>renderCard(c,false)).join("")||`<div class="empty" style="grid-column:1/-1">${tasks.length?"Нет активных задач":"Данных по задачам пока нет. Админ: нажмите «Загрузить Excel»"}</div>`;
+  const cg=$("completedTasks");cg.className="grid g2";
+  cg.innerHTML=completed.map(c=>renderCard(c,true)).join("")||`<div class="empty" style="grid-column:1/-1">Выполненных задач нет</div>`;
+  document.querySelectorAll(".lst").forEach(l=>{if(sc[l.dataset.for]!=null)l.scrollTop=sc[l.dataset.for]});
 }
 
 let unsubs=[];
@@ -272,6 +329,19 @@ $("impFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=a
 $("impGo").onclick=async()=>{const k=key(cur),ex=new Set(toAll.filter(x=>x.month===k).map(x=>x.name.toLowerCase())),jobs=[];
   for(const n of $("impTxt").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)){if(ex.has(n.toLowerCase()))continue;ex.add(n.toLowerCase());jobs.push(addDoc(collection(db,"to_stores"),{name:n,month:k,done:false}))}
   try{await Promise.all(jobs);$("impDlg").close();alert("Добавлено: "+jobs.length)}catch{alert("Ошибка записи. Войдите как админ")}};
+
+/* интерфейс: ТО, разработка, архив */
+let toCollapsed=false;
+$("toToggle").onclick=()=>{toCollapsed=!toCollapsed;$("toList").classList.toggle("collapsed",toCollapsed);$("toToggle").textContent=toCollapsed?"▶":"▼"};
+$("devBtn").onclick=()=>{$("devPanel").classList.toggle("show")};
+$("devClose").onclick=()=>{$("devPanel").classList.remove("show")};
+$("archiveBtn").onclick=()=>{$("completedSec").classList.toggle("show");if($("completedSec").classList.contains("show"))$("completedSec").scrollIntoView({behavior:"smooth",block:"start"})};
+$("archiveClose").onclick=()=>{$("completedSec").classList.remove("show")};
+$("tasks").addEventListener("click",e=>{const b=e.target.closest("[data-bulk]");if(!b)return;const id=b.dataset.bulk,t=tn(id);if(!t)return;
+  t.items.forEach((x,i)=>{if(!x.d){P[`it:${id}:${i}`]={k:"it",id,i,v:1}}});render();
+});
+$("tasks").addEventListener("change",e=>{const t=e.target;if(t.dataset.rsort){localStorage.setItem("rsort:"+t.dataset.rsort,t.value);renderTasks()}});
+$("completedTasks").addEventListener("change",e=>{const t=e.target;if(t.dataset.rsort){localStorage.setItem("rsort:"+t.dataset.rsort,t.value);renderTasks()}});
 
 /* локальные фильтры */
 $("q").value=S.q;$("fs").value=S.sort;$("fo").checked=S.only;
@@ -327,7 +397,8 @@ const fmt=ms=>{const d=new Date(ms);return `${p2(d.getDate())}.${p2(d.getMonth()
 const dur=ms=>{const m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} дн. ${h} ч`:h?`${h} ч ${m%60} мин`:`${m} мин`};
 function renderLinks(){
   const down=links.filter(x=>x.up===false).sort((a,b)=>a.since-b.since),up=links.filter(x=>x.up===true).length,tot=links.length;
-  $("lkSec").style.display=tot||admin?"":"none";$("lkSec").classList.toggle("alert",down.length>0);
+  $("devDot").classList.toggle("bad",down.length>0);
+  $("devStatusText").textContent=tot?(down.length?`Каналы: ${down.length} нет`:`Каналы: ${up}/${tot}`):"Каналы";
   $("lkDate").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
   const stale=meta&&Date.now()-meta.last>15*6e4;
   $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
