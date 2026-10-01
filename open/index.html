@@ -87,15 +87,18 @@ dialog label.f input,dialog label.f select{width:100%}
 .lks{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:6px}
 .lk{padding:8px 12px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad);color:#ffb4ae}.lk b{color:#fff}.lk span{display:block;color:var(--mute);font-size:12px}
 .lkok{color:var(--ok);font-weight:700;padding:2px 0}#lkSec.alert{border-color:var(--bad)}
+body.locked .wrap{display:none}
+#lockMsg{display:none;max-width:520px;margin:60px auto;padding:0 16px;text-align:center;color:var(--mute)}body.locked #lockMsg{display:block}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">КРД<b>.</b>ЗАДАЧИ</div>
-  <button id="loginBtn" class="pri">Вход для админа</button>
+  <button id="loginBtn" class="pri">Вход</button>
   <span class="who" id="who"></span><button id="logoutBtn" class="adm">Выйти</button>
   <div class="sp"></div>
 </header>
+<div id="lockMsg"><h2>Для просмотра войдите в систему</h2><p>Нажмите «Вход» в правом верхнем углу. Учётные записи выдаёт администратор.</p></div>
 <div class="wrap">
   <section id="lkSec" style="margin-bottom:16px;display:none">
     <div class="hd"><h2>Статус основных каналов · <span id="lkDate"></span></h2><span class="cnt" id="lkSum"></span><span class="sp"></span><button class="adm" id="lkBtn">Загрузить IP</button></div>
@@ -126,7 +129,7 @@ dialog label.f input,dialog label.f select{width:100%}
   </div>
 </div>
 
-<dialog id="loginDlg"><h2>Вход для админа</h2>
+<dialog id="loginDlg"><h2>Вход</h2>
   <label class="f">Логин<input type="text" id="lu" autocomplete="username"></label>
   <label class="f">Пароль<input type="password" id="lp" autocomplete="current-password"></label>
   <div class="err" id="lerr"></div>
@@ -167,7 +170,7 @@ dialog label.f input,dialog label.f select{width:100%}
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,collection,onSnapshot,addDoc,setDoc,updateDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,onSnapshot,addDoc,setDoc,updateDoc,deleteDoc,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCX2CTvfJMLdhVYIuEfY8sgPWawvaU8DYI",authDomain:"krd-tracker.firebaseapp.com",projectId:"krd-tracker",storageBucket:"krd-tracker.firebasestorage.app",messagingSenderId:"506382681336",appId:"1:506382681336:web:e093bf1daba1656685270d"});
 const db=getFirestore(app),auth=getAuth(app),MAIL="@krd.ru";
@@ -233,9 +236,22 @@ function renderTasks(){
   document.querySelectorAll(".lst").forEach(l=>{if(sc[l.dataset.for])l.scrollTop=sc[l.dataset.for]});
 }
 
-onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()});
-onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()});
-onAuthStateChanged(auth,u=>{admin=!!u;if(!u)P={};renderLinks();document.body.classList.toggle("admin",admin);$("loginBtn").style.display=admin?"none":"";$("who").textContent=u?u.email.replace(MAIL,""):"";render()});
+let unsubs=[];
+function stopData(){unsubs.forEach(u=>u());unsubs=[];toAll=[];tasks=[];links=[];meta=null}
+function startData(){stopData();const er=e=>console.warn("Firestore:",e.code||e);unsubs=[
+  onSnapshot(collection(db,"to_stores"),s=>{toAll=s.docs.map(d=>({id:d.id,...d.data()}));render()},er),
+  onSnapshot(collection(db,"tasks"),s=>{tasks=s.docs.map(d=>({id:d.id,items:[],ord:0,...d.data()})).sort((a,b)=>a.ord-b.ord);render()},er),
+  onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()},er),
+  onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()},er)]}
+onAuthStateChanged(auth,async u=>{const ok=!!u;
+  /* админ = у пользователя есть документ admins/<его uid> в Firestore (создаётся вручную в консоли Firebase) */
+  admin=false;if(ok){try{admin=(await getDoc(doc(db,"admins",u.uid))).exists()}catch{admin=false}}
+  if(ok)startData();else{stopData();P={}}
+  document.body.classList.toggle("locked",!ok);document.body.classList.toggle("admin",admin);
+  $("loginBtn").style.display=ok?"none":"";$("logoutBtn").style.display=ok?"inline-block":"none";
+  $("who").textContent=u?u.email.replace(MAIL,"")+(admin?" (админ)":""):"";
+  renderLinks();render();
+  if(!ok&&!$("loginDlg").open)$("loginDlg").showModal()});
 
 /* вход */
 $("loginBtn").onclick=()=>{$("lerr").textContent="";$("loginDlg").showModal()};
@@ -316,8 +332,6 @@ function renderLinks(){
   const stale=meta&&Date.now()-meta.last>15*6e4;
   $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
   $("lkList").innerHTML=down.length?down.map(x=>`<div class="lk"><b>${esc(x.name)}</b> — основной канал не в сети<span>с ${fmt(x.since)} · ${dur(Date.now()-x.since)}</span></div>`).join(""):(tot&&up===tot?`<div class="lkok">✓ Все основные каналы в сети</div>`:"")}
-onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()});
-onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()});
 setInterval(renderLinks,6e4);
 const IPV4=/\b(?:\d{1,3}\.){3}\d{1,3}\b/;
 const parseLinks=txt=>txt.split(/\r?\n/).flatMap(l=>{const m=l.match(IPV4);if(!m)return[];const c=l.split(/\t|;/).map(x=>x.trim()).filter(Boolean);
