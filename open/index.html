@@ -115,6 +115,166 @@ body.anon #gate{display:grid}body.anon .wrap{display:none}body.load #gate,body.l
 .gbox .logo{font-size:24px;margin-bottom:2px}.gbox label.f{display:block;font-size:13px;color:var(--mute);margin-top:8px}.gbox input{margin-top:3px}
 #loginBtn{display:none!important}#logoutBtn{display:none!important}body.in #logoutBtn{display:inline-block!important}
 body.anon .badge,body.anon .zm{display:none!important}
+
+/* ---- Visual refresh: calm operations dashboard, clearer hierarchy ---- */
+:root{
+  --bg:#0b1118;--p:#121b25;--p2:#182431;--ink:#edf3f8;--mute:#9aabba;--line:#2a3948;
+  --acc:#f0aa24;--ok:#45c47a;--bad:#f16a62;--okbg:#12291f;--badbg:#321b1d;
+}
+body{
+  background:radial-gradient(ellipse at 72% -18%,#193044 0,transparent 36%),var(--bg);
+  color:var(--ink);font-size:15px;line-height:1.5;letter-spacing:.005em;
+}
+header{
+  position:sticky;top:0;z-index:15;min-height:62px;padding:10px 22px;
+  background:#0e151eeF;border-bottom:1px solid #344252;backdrop-filter:blur(14px);
+  box-shadow:0 8px 24px #0003;gap:10px 14px;
+}
+.logo{font-size:20px;letter-spacing:.7px}
+.logo::before{
+  content:"";display:inline-block;width:10px;height:22px;margin-right:9px;vertical-align:-5px;
+  border-radius:5px 5px 5px 2px;background:linear-gradient(160deg,#ffd26b,var(--acc));
+  box-shadow:0 0 18px #f0aa2440;transform:skew(-13deg);
+}
+button{
+  border-radius:9px;padding:8px 12px;background:linear-gradient(180deg,#1b2835,#17222d);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+button:hover{border-color:#7a6842;background:#202d39;box-shadow:0 5px 16px #0003;transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+.pri{background:linear-gradient(135deg,#ffd06a,#f0a30a);border-color:#f5b52d;color:#211704;box-shadow:0 4px 14px #f0a30a27}
+.pri:hover{background:linear-gradient(135deg,#ffdc8a,#f5b52d);border-color:#ffcf65}
+.wrap{padding:18px 22px 28px}
+.overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:14px}
+.ov{
+  position:relative;min-width:0;overflow:hidden;display:grid;grid-template-columns:34px minmax(0,1fr);
+  align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(145deg,#17232f,#121b25);
+  border:1px solid #2b3948;border-radius:13px;box-shadow:0 8px 22px #0002;
+}
+.ov::after{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--tone,var(--acc))}
+.ov .mark{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:color-mix(in srgb,var(--tone,var(--acc)) 14%,transparent);color:var(--tone,var(--acc));font-size:16px;font-weight:800}
+.ov .label{font-size:12px;color:#9aabba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov .value{font-size:22px;line-height:1.2;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ov .note{font-size:11px;color:#8192a2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cols{grid-template-columns:clamp(330px,23%,440px) minmax(0,1fr);gap:16px}
+section{
+  padding:17px;background:linear-gradient(155deg,#141f2a,#111923 76%);
+  border:1px solid #2b3948;border-radius:15px;box-shadow:0 12px 34px #0002;
+}
+.hd{margin-bottom:13px}
+h2{font-size:16px;letter-spacing:.01em}
+.cnt{color:#a7b6c5}
+.month{padding:2px 1px 8px}
+.month span{font-size:15px}
+.bar{height:8px;border-radius:99px;background:#263442}
+.bar i{border-radius:99px}
+#toList{gap:7px;margin-top:12px}
+.to{
+  background:#19232d;border:1px solid #293744;border-left:3px solid #637488;
+  border-radius:9px;padding:8px 9px;gap:8px;color:#e3eaf0;font-size:14px;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.to:hover{background:#202e3a;border-color:#506274;transform:translateY(-1px)}
+.to.done{background:#14271f;border-color:#274a36;border-left-color:var(--ok)}
+.to.done:hover{background:#193126}
+.to .n{font-weight:550}
+.to.done .n{color:#a4b6ad}
+.to .dng{opacity:.65}
+.to .dng:hover{opacity:1;color:var(--bad)}
+.add{gap:9px;margin-top:12px}
+input[type=text],input[type=password],input[type=date],select,textarea{
+  border-radius:9px;background:#0e1720;color:var(--ink);border-color:#334353;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:focus,textarea:focus{
+  border-color:#c28b23;box-shadow:0 0 0 3px #f0aa241a;outline:none;
+}
+.fb{
+  padding:9px;background:#101923;border:1px solid #293847;border-radius:12px;
+  margin-bottom:14px;gap:8px;
+}
+.fb input[type=text]{min-width:200px}
+.fb select{max-width:210px}
+.chk{font-size:13px}
+.grid{gap:14px}
+.tc{
+  background:linear-gradient(145deg,#192531,#151f29 68%);border:1px solid #2e3d4c;
+  border-top:3px solid var(--acc);border-radius:15px;padding:15px;
+  box-shadow:0 8px 22px #0002;transition:border-color .18s,box-shadow .18s,transform .18s;
+}
+.tc:hover{border-color:#405366;box-shadow:0 12px 28px #0003;transform:translateY(-1px)}
+.tc.full{border-top-color:var(--ok)}
+.top{gap:13px;margin-bottom:12px}
+.top .ring{width:68px;height:68px}
+.top .ring i{width:54px;height:54px;font-size:15px}
+.top h3{font-size:18px;line-height:1.25;letter-spacing:.005em}
+.sub{color:#b3c0cc;font-size:13px;line-height:1.45}
+.sub b{color:#f2f6fa}
+.sub2{font-size:12px;color:#8fa0b0}
+.rs{gap:6px 8px;margin-top:12px}
+.rr{
+  grid-template-columns:minmax(0,1fr) auto 38px;padding:6px 8px;border:1px solid #2b3947;
+  border-radius:8px;background:#121c26;font-size:13px;min-width:0;
+}
+.rr:hover{background:#202e3a;border-color:#536577;transform:none}
+.rr.on{border-color:var(--acc);background:#2a251a;box-shadow:inset 0 0 0 1px #f0aa2420}
+.rr .mb{height:3px;margin-top:4px}
+details{margin-top:12px;padding-top:9px;border-top-color:#2d3b49}
+summary{padding:3px 0;font-weight:550;color:#aab8c6}
+.lst{gap:2px 12px;max-height:360px;margin-top:9px}
+.it{padding:5px 6px;border-radius:7px;min-width:0}
+.it:hover{background:#202d39}
+.it .o{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .r,.it .dt{font-size:12px}
+.empty{padding:24px 12px;color:#a1b0bd}
+.badge{border-radius:10px;background:#191f25}
+.badge i{animation:none}
+.badge.red{background:#301b1d}
+.badge.red i{animation:bl 1.2s infinite}
+.badge.stale{color:#f0c24a;border-color:#6b5a1a;background:#2a2518}
+.zm button{min-width:42px}
+.who{font-size:13px}
+dialog{border-radius:15px;padding:22px;box-shadow:0 24px 80px #0009}
+dialog.wide{width:min(900px,94vw)}
+.sh,.lg{border-radius:11px}
+#pbar{bottom:18px;border-radius:14px;padding:12px 16px;box-shadow:0 12px 40px #0008}
+.gbox{border-radius:16px;box-shadow:0 20px 60px #0005}
+
+@media(max-width:1100px){
+  .cols{grid-template-columns:330px minmax(0,1fr);gap:12px}
+  .wrap{padding:14px}
+  .fb select{max-width:180px}
+}
+@media(max-width:900px){
+  header{padding:10px 14px}
+  .cols{grid-template-columns:minmax(0,1fr);}
+  .wrap{padding:12px}
+  .overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  header{position:relative;padding:10px 12px;gap:8px}
+  header .sp{display:none}
+  header .logo{margin-right:auto}
+  .wrap{padding:9px}
+  .overview{gap:7px;margin-bottom:9px}
+  .ov{grid-template-columns:28px minmax(0,1fr);gap:7px;padding:9px}
+  .ov .mark{width:27px;height:27px;border-radius:8px}
+  .ov .value{font-size:19px}
+  .ov .label{font-size:11px}
+  .ov .note{font-size:10px}
+  section{padding:12px;border-radius:12px}
+  #toList{grid-template-columns:1fr}
+  .fb{align-items:stretch}
+  .fb input[type=text]{min-width:100%;}
+  .fb select{max-width:none;flex:1 1 42%}
+  .fb .chk{flex:1 1 100%;}
+  .top .ring{width:60px;height:60px}
+  .top .ring i{width:48px;height:48px}
+  .top h3{font-size:16px}
+  .tc{padding:12px}
+  #pbar{left:9px;right:9px;bottom:9px;transform:none;gap:7px;padding:10px}
+  #pbar span{flex:1 1 100%;text-align:center}
+}
 </style>
 </head>
 <body class="anon load">
@@ -132,6 +292,7 @@ body.anon .badge,body.anon .zm{display:none!important}
   <label class="f">Пароль<input type="password" id="gp" autocomplete="current-password"></label>
   <div class="err" id="gerr"></div><button class="pri" id="ggo">Войти</button></div></div>
 <div class="wrap">
+  <div class="overview" id="overview" aria-live="polite"></div>
   <div class="cols">
     <section>
       <div class="hd"><h2>ТО на месяц <span class="cnt" id="toCnt"></span></h2><div style="display:flex;gap:6px"><button id="toOnly" title="Что показывать">Все</button><button class="ta" id="toImp">Импорт</button></div></div>
@@ -236,6 +397,15 @@ function render(){
   $("mlabel").textContent=cur.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
   const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
   const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
+  const activeTasks=tasks.filter(t=>!isFin(t));
+  const remaining=activeTasks.reduce((n,t)=>n+t.items.filter(x=>!x.d).length,0);
+  const now=new Date(),todayKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+  const overdue=activeTasks.filter(t=>t.dl&&t.dl<todayKey&&t.items.some(x=>!x.d)).length;
+  $("overview").innerHTML=`
+    <div class="ov" style="--tone:var(--acc)"><div class="mark">✓</div><div><div class="label">ТО · ${cur.toLocaleDateString("ru-RU",{month:"long"})}</div><div class="value">${dn}/${to.length}</div><div class="note">${to.length?`Выполнено ${toP}%`:"Список пока пуст"}</div></div></div>
+    <div class="ov" style="--tone:#63a9ff"><div class="mark">◷</div><div><div class="label">Задачи в работе</div><div class="value">${activeTasks.length}</div><div class="note">Всего задач: ${tasks.length}</div></div></div>
+    <div class="ov" style="--tone:#bd9cff"><div class="mark">▤</div><div><div class="label">Объектов осталось</div><div class="value">${remaining.toLocaleString("ru-RU")}</div><div class="note">В активных задачах</div></div></div>
+    <div class="ov" style="--tone:${overdue?"var(--bad)":"var(--ok)"}"><div class="mark">!</div><div><div class="label">Просрочено</div><div class="value">${overdue}</div><div class="note">${overdue?"Проверьте сроки задач":"Нет задач с просрочкой"}</div></div></div>`;
   $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
   const toShow=S.toOnly?to.filter(x=>!x.done):to;
   $("toList").innerHTML=toShow.map(x=>{const pv=P["to:"+x.id],v=pv?pv.v:x.done,dl=P["dt:"+x.id];
@@ -396,8 +566,10 @@ function renderLinks(){
   const down=links.filter(x=>x.up===false).sort((a,b)=>a.since-b.since),up=links.filter(x=>x.up===true).length,tot=links.length;
 $("lkSec").classList.toggle("alert",down.length>0);
   $("lkDate").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
-  const stale=meta&&Date.now()-meta.last>15*6e4;
-  $("lkBadge").className=down.length&&!stale?"badge red":"badge";$("lkBadgeT").textContent=down.length&&!stale?`Каналы: не в сети ${down.length}`:"Каналы: в разработке";
+  const stale=meta&&Date.now()-meta.last>15*6e4,hasDown=down.length>0&&!stale;
+  const badgeState=!tot?"badge":stale?"badge stale":hasDown?"badge red":"badge";
+  const badgeText=!tot?"Каналы: нет данных":stale?"Каналы: опрос устарел":hasDown?`Каналы: сбой ${down.length}`:`Каналы: ${up}/${tot} в сети`;
+  $("lkBadge").className=badgeState;$("lkBadgeT").textContent=badgeText;
   $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
   $("lkList").innerHTML=down.length?down.map(x=>`<div class="lk"><b>${esc(x.name)}</b> — основной канал не в сети<span>с ${fmt(x.since)} · ${dur(Date.now()-x.since)}</span></div>`).join(""):(tot&&up===tot?`<div class="lkok">✓ Все основные каналы в сети</div>`:"")}
 feeds.push(()=>onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()}));
