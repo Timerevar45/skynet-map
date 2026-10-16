@@ -84,9 +84,6 @@ dialog label.f{display:block;font-size:13px;color:var(--mute);margin-top:10px}
 #pbar.on{display:flex}#pbar span{font-weight:600}
 dialog label.f input,dialog label.f select{width:100%}
 #cfmList{max-height:50vh;overflow:auto;padding-left:20px;margin:10px 0}#cfmList li{margin:3px 0}
-.lks{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:6px}
-.lk{padding:8px 12px;border-radius:6px;background:var(--badbg);border-left:4px solid var(--bad);color:#ffb4ae}.lk b{color:#fff}.lk span{display:block;color:var(--mute);font-size:12px}
-.lkok{color:var(--ok);font-weight:700;padding:2px 0}#lkSec.alert{border-color:var(--bad)}
 body{font-size:15px}
 .wrap{max-width:none;padding:12px 16px}
 .cols{grid-template-columns:clamp(380px,24%,520px) 1fr;gap:14px}
@@ -98,11 +95,6 @@ body{font-size:15px}
 .to .dng{padding:0 6px;border:none;background:transparent}
 .tabs{display:flex;gap:6px}.tab{font-weight:700;padding:8px 16px}.tab.on{background:var(--acc);border-color:var(--acc);color:#1a1200}
 .zm{display:flex;gap:6px;align-items:center}.zm span{min-width:46px;text-align:center;color:var(--mute)}
-.badge{display:flex;gap:8px;align-items:center;color:#f0c24a;border-color:#6b5a1a}
-.badge i{width:10px;height:10px;border-radius:50%;background:var(--acc);animation:bl 1.2s infinite}
-.badge.red{color:#ffb4ae;border-color:var(--bad)}.badge.red i{background:var(--bad)}
-@keyframes bl{50%{opacity:.15}}
-.warn{background:#2e2608;border:1px solid #6b5a1a;color:#f0c24a;padding:8px 12px;border-radius:6px;margin-bottom:10px}
 .top .ring{width:72px;height:72px}.top .ring i{width:54px;height:54px;font-size:16px}
 .top h3{font-size:19px}.sub{font-size:14px}.rs{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.rr{font-size:15px}.it{font-size:14px}
 .ok{color:var(--ok)}
@@ -119,7 +111,7 @@ body.anon #gate{display:grid}body.anon .wrap{display:none}body.load #gate,body.l
 .gbox{width:min(380px,92vw);background:var(--p);border:1px solid var(--line);border-radius:12px;padding:26px;display:grid;gap:8px}
 .gbox .logo{font-size:24px;margin-bottom:2px}.gbox label.f{display:block;font-size:13px;color:var(--mute);margin-top:8px}.gbox input{margin-top:3px}
 #loginBtn{display:none!important}#logoutBtn{display:none!important}body.in #logoutBtn{display:inline-block!important}
-body.anon .badge,body.anon .zm{display:none!important}
+body.anon .zm{display:none!important}
 
 /* ---- Visual refresh: calm operations dashboard, clearer hierarchy ---- */
 :root{
@@ -150,7 +142,7 @@ button:active{transform:translateY(0)}
 .pri{background:linear-gradient(135deg,#ffd06a,#f0a30a);border-color:#f5b52d;color:#211704;box-shadow:0 4px 14px #f0a30a27}
 .pri:hover{background:linear-gradient(135deg,#ffdc8a,#f5b52d);border-color:#ffcf65}
 .wrap{padding:18px 22px 28px}
-.overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:14px}
+.overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:14px}
 .ov{
   position:relative;min-width:0;overflow:hidden;display:grid;grid-template-columns:34px minmax(0,1fr);
   align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(145deg,#17232f,#121b25);
@@ -224,6 +216,12 @@ input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:
 .rr:hover{background:#202e3a;border-color:#536577;transform:none}
 .rr.on{border-color:var(--acc);background:#2a251a;box-shadow:inset 0 0 0 1px #f0aa2420}
 .rr .mb{height:3px;margin-top:4px}
+.rr.low{--meter-color:var(--bad)}.rr.mid{--meter-color:var(--acc)}.rr.high{--meter-color:var(--ok)}
+.rr em{color:var(--meter-color)}.rr .mb i{background:var(--meter-color)}
+.resp-legend{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin:-3px 2px 8px;color:var(--mute);font-size:11px}
+.resp-legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.resp-legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.resp-legend .low{background:var(--bad)}.resp-legend .mid{background:var(--acc)}.resp-legend .high{background:var(--ok)}
 details{margin-top:12px;padding-top:9px;border-top-color:#2d3b49}
 summary{padding:3px 0;font-weight:550;color:#aab8c6}
 .lst{gap:2px 12px;max-height:360px;margin-top:9px}
@@ -232,11 +230,6 @@ summary{padding:3px 0;font-weight:550;color:#aab8c6}
 .it .o{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .it .r,.it .dt{font-size:12px}
 .empty{padding:24px 12px;color:#a1b0bd}
-.badge{border-radius:10px;background:#191f25}
-.badge i{animation:none}
-.badge.red{background:#301b1d}
-.badge.red i{animation:bl 1.2s infinite}
-.badge.stale{color:#f0c24a;border-color:#6b5a1a;background:#2a2518}
 .zm button{min-width:42px}
 .who{font-size:13px}
 dialog{border-radius:15px;padding:22px;box-shadow:0 24px 80px #0009}
@@ -288,7 +281,6 @@ dialog.wide{width:min(900px,94vw)}
   <button id="loginBtn" class="pri">Вход для админа</button>
   <span class="who" id="who"></span><button id="logoutBtn" class="adm">Выйти</button>
   <div class="sp"></div>
-  <button id="lkBadge" class="badge" title="Статус основных каналов"><i></i><span id="lkBadgeT">Каналы: в разработке</span></button>
   <button id="logBtn" class="fa">Журнал</button>
   <div class="zm"><button id="zm1" title="Уменьшить">A−</button><span id="zmv"></span><button id="zm2" title="Увеличить">A+</button></div>
 </header>
@@ -321,6 +313,7 @@ dialog.wide{width:min(900px,94vw)}
         <label class="chk"><input type="checkbox" id="fo">только невыполненные</label>
         <button id="fx">Сбросить</button>
       </div>
+      <div class="resp-legend" aria-label="Уровни выполнения системотехников"><span>Прогресс:</span><span><i class="low"></i>&lt;50%</span><span><i class="mid"></i>50–&lt;85%</span><span><i class="high"></i>≥85%</span></div>
       <div class="grid" id="tasks"></div>
     </section>
   </div>
@@ -346,19 +339,6 @@ dialog.wide{width:min(900px,94vw)}
 <dialog id="logDlg" class="wide logdlg"><div class="loghead"><div><h2>Журнал действий</h2><p class="hint">История изменений задач, объектов и отметок выполнения</p></div><div class="logheadright"><span id="logCount" class="logcount"></span><button id="logExcel" class="fa">Скачать Excel</button><button id="logPdf" class="fa">Печать / PDF</button></div></div>
   <div class="logfilters"><input type="text" id="logQ" placeholder="Поиск по сотруднику, задаче или объекту"><select id="logPeriod" aria-label="Период"><option value="all">За всё время</option><option value="7">Последние 7 дней</option><option value="14">Последние 14 дней</option><option value="30">Последние 30 дней</option></select><select id="logUser" aria-label="Сотрудник"><option value="">Все сотрудники</option></select><select id="logType" aria-label="Тип события"><option value="">Все изменения</option><option value="done">Выполнение</option><option value="undo">Снятие отметки</option><option value="add">Добавление</option><option value="other">Другие</option></select></div>
   <div id="logList"></div><div class="row"><button id="logClose">Закрыть</button></div></dialog>
-
-<dialog id="lkPanel" class="wide"><div class="warn">🚧 Функция в разработке: автоматический опрос каналов ещё не подключён, данные ниже появятся после запуска агента.</div>
-  <section id="lkSec" style="border:none;padding:0">
-    <div class="hd"><h2>Статус основных каналов · <span id="lkDate"></span></h2><span class="cnt" id="lkSum"></span><span class="sp"></span><button class="fa" id="lkBtn">Загрузить IP</button></div>
-    <div class="lks" id="lkList"></div>
-  </section><div class="row"><button id="lkClose">Закрыть</button></div></dialog>
-
-<dialog id="lkDlg"><h2>Основные каналы: магазины и IP</h2>
-  <p class="hint">Два столбца из Excel (название магазина и IP основного канала) или файл .xlsx / .txt. Повторная загрузка обновляет IP у существующих магазинов. IP видны только админам.</p>
-  <textarea id="lkTxt" placeholder="Отлив&#9;10.20.30.40"></textarea>
-  <label class="hint">Или файл: <input type="file" id="lkFile" accept=".xlsx,.xls,.txt,.csv"></label>
-  <div class="hint" id="lkCnt"></div>
-  <div class="row"><button id="lkCancel">Отмена</button><button class="pri" id="lkGo">Загрузить</button></div></dialog>
 
 <div id="pbar"><span id="pcnt"></span><button id="pundo">Отменить все</button><button class="pri" id="papply">Применить изменения</button></div>
 
@@ -403,13 +383,11 @@ function render(){
   const to=toAll.filter(x=>x.month===k).sort((a,b)=>a.done-b.done||a.name.localeCompare(b.name,"ru"));
   const dn=to.filter(x=>x.done).length,toP=to.length?Math.round(dn/to.length*100):0;
   const activeTasks=tasks.filter(t=>!isFin(t));
-  const remaining=activeTasks.reduce((n,t)=>n+t.items.filter(x=>!x.d).length,0);
   const now=new Date(),todayKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
   const overdue=activeTasks.filter(t=>t.dl&&t.dl<todayKey&&t.items.some(x=>!x.d)).length;
   $("overview").innerHTML=`
     <div class="ov" style="--tone:var(--acc)"><div class="mark">✓</div><div><div class="label">ТО · ${cur.toLocaleDateString("ru-RU",{month:"long"})}</div><div class="value">${dn}/${to.length}</div><div class="note">${to.length?`Выполнено ${toP}%`:"Список пока пуст"}</div></div></div>
     <div class="ov" style="--tone:#63a9ff"><div class="mark">◷</div><div><div class="label">Задачи в работе</div><div class="value">${activeTasks.length}</div><div class="note">Всего задач: ${tasks.length}</div></div></div>
-    <div class="ov" style="--tone:#bd9cff"><div class="mark">▤</div><div><div class="label">Объектов осталось</div><div class="value">${remaining.toLocaleString("ru-RU")}</div><div class="note">В активных задачах</div></div></div>
     <div class="ov" style="--tone:${overdue?"var(--bad)":"var(--ok)"}"><div class="mark">!</div><div><div class="label">Просрочено</div><div class="value">${overdue}</div><div class="note">${overdue?"Проверьте сроки задач":"Нет задач с просрочкой"}</div></div></div>`;
   $("toCnt").textContent=to.length?`${dn}/${to.length}`:"";$("toBar").style.width=toP+"%";
   const toShow=S.toOnly?to.filter(x=>!x.done):to;
@@ -424,7 +402,7 @@ const dlTxt=(dl,left)=>{if(!dl)return"";const d=new Date(dl+"T12:00:00"),n=Math.
   return !left?tx:n<0?`<span style="color:var(--bad)">${tx} · просрочено на ${-n} дн.</span>`:n===0?`${tx} · сегодня`:`${tx} · осталось ${n} дн.`};
 const isFin=t=>t.items.length>0&&t.items.every(x=>x.d);
 const f2=ms=>new Date(ms).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
-const pc=v=>v.d/v.n;
+const pc=v=>v.d/v.n,respBand=p=>p<50?"low":p<85?"mid":"high";
 const RSORT={pd:(a,b)=>pc(b[1])-pc(a[1])||b[1].n-a[1].n,pa:(a,b)=>pc(a[1])-pc(b[1])||b[1].n-a[1].n,ld:(a,b)=>(b[1].n-b[1].d)-(a[1].n-a[1].d),dd:(a,b)=>b[1].d-a[1].d,az:(a,b)=>a[0].localeCompare(b[0],"ru")};
 const TSORT={file:(a,b)=>a.t.ord-b.t.ord,pa:(a,b)=>a.p-b.p,pd:(a,b)=>b.p-a.p,ld:(a,b)=>b.left-a.left,dl:(a,b)=>(a.t.dl||"9").localeCompare(b.t.dl||"9")};
 function renderTasks(){
@@ -447,7 +425,7 @@ function renderTasks(){
   $("tasks").style.gridTemplateColumns=`repeat(${nc},minmax(0,1fr))`;
   $("tasks").innerHTML=cs.map(c=>{
     const t=c.t,p=Math.round(c.p),g={},kd=!!P["dk:"+t.id],pl=P["dl:"+t.id],dlv=pl?pl.v:(t.dl||"");
-    c.base.forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
+    t.items.filter(x=>!S.resp||x.r===S.resp).forEach(x=>{(g[x.r]??={n:0,d:0});g[x.r].n++;g[x.r].d+=x.d});
     const list=(S.only&&!isD?c.base.filter(x=>!x.d):c.base).sort((a,b)=>a.d-b.d||a.o.localeCompare(b.o,"ru"));
     const mode={status:"по статусу из файла",date:"по дате: срок наступил = выполнено",none:"статус в файле не найден",manual:"добавлено вручную"}[t.mode]||"";
     const td=Math.max(0,...t.items.map(x=>x.td||0));
@@ -458,8 +436,8 @@ function renderTasks(){
       <div class="sub2">${mode} · ${isFin(t)&&td?"закрыта "+f2(td):"обновлено "+new Date(t.upd).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</div></div>
       ${isFull?`<div style="display:grid;gap:4px"><button data-addto="${t.id}" title="Добавить объекты">+</button>${isD?"":`<button class="ok" data-markall="${t.id}" title="Отметить ВСЕ объекты выполненными">✓</button>`}<button class="${kd?"":"dng"}" data-deltask="${t.id}" title="Удалить задачу">${kd?"↩":"✕"}</button></div>`:""}</div>
      <div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
-     <div class="rs">${Object.entries(g).sort(RSORT[S.sort]||RSORT.pd).map(([r,v])=>{const q=Math.round(v.d/v.n*100);
-       return `<button class="rr ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
+     <div class="rs">${Object.entries(g).sort(RSORT[S.sort]||RSORT.pd).map(([r,v])=>{const exact=v.d/v.n*100,q=Math.round(exact),band=respBand(exact);
+       return `<button class="rr ${band} ${S.resp===r?"on":""}" data-resp="${esc(r)}" title="Фильтр по системотехнику · точное выполнение: ${exact.toFixed(1)}%"><span>${esc(r)}</span><b>${v.d}/${v.n}</b><em>${q}%</em><span class="mb"><i style="width:${q}%"></i></span></button>`}).join("")}</div>
      <details data-id="${t.id}" ${opened.has(t.id)?"open":""}><summary>Объекты (${list.length})</summary><div class="lst" data-for="${t.id}">
       ${list.map(x=>{const pv=P[`it:${t.id}:${x.i}`],v=pv?pv.v:x.d,di=P[`di:${t.id}:${x.i}`],dt=x.d&&x.td?f2(x.td):(x.t||"");
         return `<div class="it ${v?"d":""} ${pv?"chg":""} ${di?"del":""}"><label class="lb"><input type="checkbox" ${v?"checked":""} ${isFull?"":"disabled"} data-t="${t.id}" data-i="${x.i}"><span class="o">${esc(x.o)}</span></label><span class="r">${esc(x.r)}</span>${dt?`<span class="dt">${dt}</span>`:""}${isFull?`<button class="x ${di?"":"dng"}" data-delit="${t.id}:${x.i}" title="Удалить объект">${di?"↩":"✕"}</button>`:""}</div>`}).join("")||`<div class="empty">Нет объектов</div>`}</div></details></div>`}).join("")
@@ -481,8 +459,8 @@ onAuthStateChanged(auth,async u=>{
   if(unsubLogs){unsubLogs();unsubLogs=null}logs=[];
   if(isFull)unsubLogs=onSnapshot(query(collection(db,"logs"),orderBy("ts","desc"),limit(300)),s=>{logs=s.docs.map(d=>d.data());renderLogs()},()=>{});
   unsubs.splice(0).forEach(f=>f());
-  if(u)feeds.forEach(f=>unsubs.push(f()));else{toAll=[];tasks=[];links=[];meta=null}
-  renderLinks();render();
+  if(u)feeds.forEach(f=>unsubs.push(f()));else{toAll=[];tasks=[]}
+  render();
 });
 
 /* вход */
@@ -520,7 +498,6 @@ $("tAct").onclick=()=>{S.tab="act";save();renderTasks()};$("tDone").onclick=()=>
 const zoom=d=>{S.zoom=Math.min(2.4,Math.max(.6,Math.round((S.zoom+d)*10)/10));save();render()};
 $("zm1").onclick=()=>zoom(-.1);$("zm2").onclick=()=>zoom(.1);
 $("toOnly").onclick=()=>{S.toOnly=!S.toOnly;save();render()};
-$("lkBadge").onclick=()=>$("lkPanel").showModal();$("lkClose").onclick=()=>$("lkPanel").close();
 addEventListener("resize",()=>renderTasks());
 
 /* разбор Excel */
@@ -562,38 +539,7 @@ $("xlsGo").onclick=async()=>{const use=xs.filter(s=>s.use);if(!use.length){alert
   try{await Promise.all(use.map(s=>{const b=build(s);return setDoc(doc(db,"tasks",sid(s.n)),{name:s.n,items:b.items,mode:b.mode,ord:s.ord,dl:s.dl||"",upd:Date.now()})}));$("xlsDlg").close();logAct("Загружен Excel: листы "+use.map(s=>"«"+s.n+"»").join(", "))}
   catch{alert("Ошибка записи. Проверьте вход и правила Firestore")}};
 
-/* статус основных каналов (опрашивает ping_agent.py, сайт только показывает) */
-let links=[],meta=null;
 const p2=n=>String(n).padStart(2,"0");
-const fmt=ms=>{const d=new Date(ms);return `${p2(d.getDate())}.${p2(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`};
-const dur=ms=>{const m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} дн. ${h} ч`:h?`${h} ч ${m%60} мин`:`${m} мин`};
-function renderLinks(){
-  const down=links.filter(x=>x.up===false).sort((a,b)=>a.since-b.since),up=links.filter(x=>x.up===true).length,tot=links.length;
-$("lkSec").classList.toggle("alert",down.length>0);
-  $("lkDate").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"2-digit"});
-  const stale=meta&&Date.now()-meta.last>15*6e4,hasDown=down.length>0&&!stale;
-  const badgeState=!tot?"badge":stale?"badge stale":hasDown?"badge red":"badge";
-  const badgeText=!tot?"Каналы: нет данных":stale?"Каналы: опрос устарел":hasDown?`Каналы: сбой ${down.length}`:`Каналы: ${up}/${tot} в сети`;
-  $("lkBadge").className=badgeState;$("lkBadgeT").textContent=badgeText;
-  $("lkSum").innerHTML=tot?`В сети <b>${up}</b> из <b>${tot}</b>${down.length?` · не в сети <b style="color:var(--bad)">${down.length}</b>`:""} · ${meta?"проверено "+fmt(meta.last).slice(9):"ждём первую проверку"}${stale?` <b style="color:var(--bad)">⚠ опрос не обновлялся более 15 минут</b>`:""}`:"список магазинов с IP не загружен";
-  $("lkList").innerHTML=down.length?down.map(x=>`<div class="lk"><b>${esc(x.name)}</b> — основной канал не в сети<span>с ${fmt(x.since)} · ${dur(Date.now()-x.since)}</span></div>`).join(""):(tot&&up===tot?`<div class="lkok">✓ Все основные каналы в сети</div>`:"")}
-feeds.push(()=>onSnapshot(collection(db,"links"),s=>{links=s.docs.map(d=>({id:d.id,...d.data()}));renderLinks()}));
-feeds.push(()=>onSnapshot(doc(db,"meta","ping"),d=>{meta=d.data()||null;renderLinks()}));
-setInterval(renderLinks,6e4);
-const IPV4=/\b(?:\d{1,3}\.){3}\d{1,3}\b/;
-const parseLinks=txt=>txt.split(/\r?\n/).flatMap(l=>{const m=l.match(IPV4);if(!m)return[];const c=l.split(/\t|;/).map(x=>x.trim()).filter(Boolean);
-  const name=c.length>1?c.find(x=>!IPV4.test(x)&&!/^[\d\s.]+$/.test(x)):l.replace(m[0],"").trim();return name?[{name,ip:m[0]}]:[]});
-$("lkBtn").onclick=()=>{$("lkTxt").value="";$("lkCnt").textContent="";$("lkDlg").showModal()};
-$("lkCancel").onclick=()=>$("lkDlg").close();
-$("lkTxt").oninput=()=>{$("lkCnt").textContent="Найдено магазинов с IP: "+parseLinks($("lkTxt").value).length};
-$("lkFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const b=await f.arrayBuffer();
-  if(/\.xlsx?$/i.test(f.name)){const wb=XLSX.read(b,{type:"array"});$("lkTxt").value=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:""}).map(r=>r.join("\t")).join("\n")}
-  else try{$("lkTxt").value=new TextDecoder("utf-8",{fatal:true}).decode(b)}catch{$("lkTxt").value=new TextDecoder("windows-1251").decode(b)}
-  e.target.value="";$("lkTxt").oninput()};
-$("lkGo").onclick=async()=>{const it=parseLinks($("lkTxt").value);if(!it.length){alert("IP-адреса не найдены");return}
-  try{await Promise.all(it.flatMap(x=>{const id=sid(x.name);return[setDoc(doc(db,"link_cfg",id),{name:x.name,ip:x.ip}),setDoc(doc(db,"links",id),{name:x.name},{merge:true})]}));$("lkDlg").close();logAct(`Каналы: загружено IP-адресов ${it.length}`);alert("Загружено магазинов: "+it.length)}
-  catch{alert("Ошибка записи. Войдите как админ и проверьте правила Firestore")}};
-
 /* журнал действий */
 const logAct=async lines=>{try{if(!user||!role)return;await addDoc(collection(db,"logs"),{ts:Date.now(),user:user.email.replace(MAIL,""),role,text:(Array.isArray(lines)?lines:[lines]).slice(0,60)})}catch{}};
 function logKind(text){if(/снята отметка|снять отметку|отменен[ао]? выполнение/i.test(text))return{key:"undo",label:"Снятие отметки"};if(/отмечено выполн|выполненным|выполнен[а-я]*/i.test(text))return{key:"done",label:"Выполнение"};if(/добавлен|новая задача|импорт|загружен excel/i.test(text))return{key:"add",label:"Добавление"};return{key:"other",label:"Изменение"}}
